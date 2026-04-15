@@ -39,6 +39,22 @@ See `src/domains/` for business domain modules:
 See `.env.example` for all required variables.
 ⚠️ `SUPABASE_SERVICE_ROLE_KEY` is backend-only — never include in client builds.
 
+## CI
+
+The GitHub Actions pipeline runs `lint` -> `typecheck` -> `test` -> `build`.
+It triggers on pull requests to `main` and `develop`, and on pushes to `develop`.
+
+Add CI environment variables through GitHub Actions secrets:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SENTRY_DSN` (optional; CI warns if missing)
+- `EXPO_TOKEN` (optional; used for EAS Build before falling back to `expo export`)
+
+To debug failures, inspect the Actions tab:
+
+- https://github.com/KRUKMAN/fridgr/actions
+
 ## Branching Strategy
 
 Branching and merge rules are documented in `CONTRIBUTING.md`, including:

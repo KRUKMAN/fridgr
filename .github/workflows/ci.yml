@@ -7,12 +7,15 @@ on:
       - develop
   push:
     branches:
-      - main
       - develop
 
+env:
+  NODE_VERSION: 20.x
+  NODE_MODULES_CACHE_KEY: ${{ runner.os }}-node20-${{ hashFiles('package-lock.json') }}
+
 jobs:
-  lint-and-typecheck:
-    name: lint-and-typecheck
+  install:
+    name: install
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,14 +26,181 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ env.NODE_MODULES_CACHE_KEY }}
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint --if-present
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    needs: install
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Typecheck
-        run: npm run typecheck --if-present
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ env.NODE_MODULES_CACHE_KEY }}
+
+      - name: Ensure dependencies are available
+        run: |
+          if [ ! -d node_modules ]; then
+            npm ci
+          fi
+
+      - name: Run lint
+        run: npm run lint
+
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    needs: install
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ env.NODE_MODULES_CACHE_KEY }}
+
+      - name: Ensure dependencies are available
+        run: |
+          if [ ! -d node_modules ]; then
+            npm ci
+          fi
+
+      - name: Run typecheck
+        run: npm run typecheck
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    needs:
+      - lint
+      - typecheck
+    permissions:
+      contents: read
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ env.NODE_MODULES_CACHE_KEY }}
+
+      - name: Ensure dependencies are available
+        run: |
+          if [ ! -d node_modules ]; then
+            npm ci
+          fi
+
+      - name: Validate CI environment variables
+        run: node scripts/validateCiEnv.cjs
+
+      - name: Run tests
+        run: npm test
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    needs: test
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ env.NODE_MODULES_CACHE_KEY }}
+
+      - name: Ensure dependencies are available
+        run: |
+          if [ ! -d node_modules ]; then
+            npm ci
+          fi
+
+      - name: Validate EAS CLI availability
+        run: npx eas-cli --version
+
+      - name: Build managed app bundle
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          # EAS build is attempted first so CI matches the managed Expo workflow.
+          # If EAS is unavailable in Wave 0 (for example, missing auth or plan limits),
+          # we fall back to `expo export` to keep bundle compilation validated.
+          if npx eas-cli build --platform all --non-interactive --no-wait; then
+            echo "EAS build queued successfully."
+          else
+            echo "Falling back to expo export after EAS build attempt failed."
+            npx expo export --platform all --output-dir dist
+          fi
+
+  lint-and-typecheck:
+    name: lint-and-typecheck
+    if: always()
+    runs-on: ubuntu-latest
+    needs:
+      - install
+      - lint
+      - typecheck
+      - test
+      - build
+    steps:
+      - name: Enforce required CI result
+        run: |
+          for result in \
+            "${{ needs.install.result }}" \
+            "${{ needs.lint.result }}" \
+            "${{ needs.typecheck.result }}" \
+            "${{ needs.test.result }}" \
+            "${{ needs.build.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "Pipeline stage failed with status: $result"
+              exit 1
+            fi
+          done
