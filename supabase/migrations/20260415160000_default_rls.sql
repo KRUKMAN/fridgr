@@ -24,6 +24,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.enable_rls_on_new_public_tables()
 RETURNS event_trigger
 LANGUAGE plpgsql
+SET search_path = pg_catalog, public
 AS $$
 DECLARE
   ddl_record RECORD;
