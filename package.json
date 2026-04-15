@@ -13,7 +13,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "husky",
-    "test": "echo 'Tests not yet configured - see separate task'"
+    "test": "node --test"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.103.1",
@@ -32,6 +32,7 @@
     "@typescript-eslint/eslint-plugin": "^8.58.2",
     "@typescript-eslint/parser": "^8.58.2",
     "babel-plugin-module-resolver": "^5.0.3",
+    "babel-preset-expo": "^55.0.17",
     "drizzle-kit": "^0.31.10",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
