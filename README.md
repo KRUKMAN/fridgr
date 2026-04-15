@@ -53,3 +53,4 @@ Branching and merge rules are documented in `CONTRIBUTING.md`, including:
 After creating a test PR that validates protection behavior, add the PR link here.
 
 - Test PR: `<add-link-here>`
+- Test PR: `https://github.com/KRUKMAN/fridgr/pull/1`
