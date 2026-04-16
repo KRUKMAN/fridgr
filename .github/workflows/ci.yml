@@ -11,7 +11,7 @@ on:
 
 env:
   NODE_VERSION: 20.x
-  NODE_MODULES_CACHE_KEY: ${{ runner.os }}-node20-${{ hashFiles('package-lock.json') }}
+  NODE_MODULES_CACHE_KEY: ubuntu-node20-${{ hashFiles('package-lock.json') }}
 
 jobs:
   install:
