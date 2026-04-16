@@ -4,9 +4,9 @@
 
 ```text
 main
-  └─ develop
-       ├─ feature/<ticket-id>-<short-desc>
-       └─ hotfix/<ticket-id>-<short-desc>
+  └── develop
+       ├── feature/<ticket-id>-<short-desc>
+       └── hotfix/<ticket-id>-<short-desc>
 ```
 
 Branch naming conventions:
@@ -27,34 +27,80 @@ Branch rules:
 - One coding agent works on exactly one `feature/*` branch per ticket.
 - No coding agent pushes directly to `main` or `develop`.
 - Parallel agents are allowed only when tickets do not compete on the same files or schema.
+- Agents should follow `AGENTS.md` for repo constraints and `TICKET_TO_CODE.md` for the implementation workflow.
 
-## 3. PR Process
+## 3. Pull Request Process
 
 - All changes are merged through pull requests.
 - PRs require 1 approval and passing CI checks.
 - Required status check context: `lint-and-typecheck`.
 - PR title format: `[Wave X] <ticket-title>` (example: `[Wave 0] Setup CI pipeline`).
-- PR description should reference the ticket.
+- PR descriptions should reference the ticket and complete the PR template.
 - Preferred merge strategy:
-- Squash merge for `feature/*` -> `develop`.
-- Regular merge for `develop` -> `main` to preserve integration history.
+- Squash merge for `feature/*` -> `develop`
+- Regular merge for `develop` -> `main` to preserve integration history
 
-## 4. Commit Messages
+## 4. Commit Message Format
 
-No `CONVENTIONS.md` is present, so use:
+Use conventional commits:
 
-- `type(scope): description`
-- Example: `feat(ci): add GitHub Actions workflow`
+`<type>(<scope>): <short description>`
+
+Example:
+
+`feat(inventory): add fridge item CRUD`
 
 Allowed types:
 
-- `feat`
-- `fix`
-- `docs`
-- `chore`
-- `refactor`
-- `test`
-- `ci`
+- `feat` - new feature or capability
+- `fix` - bug fix
+- `chore` - tooling, dependency, or configuration work
+- `docs` - documentation-only changes
+- `test` - adding or updating tests
+- `refactor` - structural changes without intended behavior change
+- `style` - formatting or lint-only edits with no logic change
+- `ci` - CI/CD workflow changes
+
+Scope rules:
+
+- Scope should match the domain or module most affected.
+- Scope is required for `feat`, `fix`, `refactor`, and `test`.
+- Scope is recommended, but optional, for `chore`, `docs`, `style`, and `ci`.
+- If a commit spans multiple domains, split the commit when possible. If not, use the most affected domain as the scope.
+
+Initial scopes:
+
+- Domains: `catalog`, `inventory`, `cooking`, `diary`, `purchase`, `household`, `identity`, `serve-split`, `ai`, `sync`
+- Cross-cutting: `ci`, `db`, `api`, `auth`, `config`, `docs`
+
+Subject rules:
+
+- Keep the subject line under 72 characters
+- Use imperative mood: `add`, `fix`, `update`, not `added` or `adds`
+- Do not end the subject line with a period
+- Make the subject specific enough to stand alone in history
+
+Optional body and footer:
+
+- Use the body when the subject line is not enough to explain intent or tradeoffs
+- Use footers for follow-up links or breaking-change notes
+- Example footer: `Closes #123`
+- Example footer: `Breaking change: rename fridge item API payload`
+
+Examples:
+
+- `feat(inventory): add fridge item CRUD`
+- `fix(diary): correct daily summary recomputation`
+- `chore(ci): validate environment variables before tests`
+- `docs(conventions): add event naming rules`
+- `test(catalog): add food variation mapping tests`
+- `refactor(sync): extract pending mutation helper`
+- `style(docs): normalize markdown headings`
+- `ci: run lint before typecheck in GitHub Actions`
+
+Security note:
+
+- Never include secrets, access tokens, credentials, or PII in commit messages.
 
 ## 5. Hotfix Process
 
