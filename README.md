@@ -40,6 +40,32 @@ See `.env.example` for all required variables.
 `SUPABASE_SERVICE_ROLE_KEY` is backend-only and must never be included
 in client builds.
 
+Client builds use only:
+
+- `EXPO_PUBLIC_APP_ENV`
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+## Staging Setup
+
+Staging is wired through the Expo/EAS `preview` environment and the
+`staging` build profile in `eas.json`.
+
+Recommended setup:
+
+1. For local development, copy `.env.example` to `.env.local` and fill
+   in your development values.
+2. For local testing against staging, pull the Expo `preview`
+   environment into `.env.local` with
+   `eas env:pull --environment preview`.
+3. For remote staging builds, store `EXPO_PUBLIC_SUPABASE_URL` and
+   `EXPO_PUBLIC_SUPABASE_ANON_KEY` in Expo/EAS under the `preview`
+   environment.
+4. Keep `SUPABASE_SERVICE_ROLE_KEY` only in backend surfaces such as
+   local admin tooling, secure CI jobs, or Supabase-managed
+   environments.
+5. Build staging with `npx eas build --profile staging`.
+
 ## CI
 
 The GitHub Actions pipeline runs `lint`, `typecheck`, `test`, and
@@ -48,8 +74,8 @@ pushes to `develop`.
 
 Add CI environment variables through GitHub Actions secrets:
 
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
 - `SENTRY_DSN` (optional; CI warns if missing)
 - `EXPO_TOKEN` (optional; used for EAS Build before falling back to
   `expo export`)

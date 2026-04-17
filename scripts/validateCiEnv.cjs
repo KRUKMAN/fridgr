@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
-const requiredKeys = ["SUPABASE_URL", "SUPABASE_ANON_KEY"];
+const requiredKeys = [
+  "EXPO_PUBLIC_APP_ENV",
+  "EXPO_PUBLIC_SUPABASE_URL",
+  "EXPO_PUBLIC_SUPABASE_ANON_KEY",
+];
 const warningKeys = ["SENTRY_DSN"];
 
 const missingRequired = requiredKeys.filter((key) => {
