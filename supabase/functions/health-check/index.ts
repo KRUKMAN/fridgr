@@ -1,4 +1,7 @@
 declare const Deno: {
+  env: {
+    get: (key: string) => string | undefined;
+  };
   serve: (handler: (request: Request) => Response | Promise<Response>) => void;
 };
 
@@ -15,6 +18,8 @@ const createJsonResponse = (body: Readonly<Record<string, string>>, status = 200
     headers: corsHeaders,
   });
 
+const getEnvironment = (): string => Deno.env.get('ENVIRONMENT') ?? 'unknown';
+
 const handler = (request: Request): Response => {
   if (request.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -24,7 +29,7 @@ const handler = (request: Request): Response => {
     return createJsonResponse({ error: 'Method Not Allowed' }, 405);
   }
 
-  return createJsonResponse({ status: 'ok', environment: 'dev' });
+  return createJsonResponse({ status: 'ok', environment: getEnvironment() });
 };
 
 Deno.serve(handler);
