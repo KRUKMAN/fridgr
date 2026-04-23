@@ -21,3 +21,4 @@ export { ListItem, type ListItemProps } from './ListItem';
 export { Modal, type ModalProps } from './Modal';
 export { Spinner, type SpinnerProps } from './Spinner';
 export { ToastProvider, useToast, type ToastPayload, type ToastVariant } from './Toast';
+export { MemberList, type MemberListMember, type MemberListProps } from './household/MemberList';

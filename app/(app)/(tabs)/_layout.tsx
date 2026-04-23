@@ -42,14 +42,14 @@ export default function TabsLayout(): React.JSX.Element | null {
       <Tabs.Screen name="fridge" options={{ title: 'Fridge' }} />
       <Tabs.Screen name="diary" options={{ title: 'Diary' }} />
       <Tabs.Screen name="cook" options={{ title: 'Cook' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
+      <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
     </Tabs>
   );
 }
 
 function getTabIcon(
   routeName: string,
-): 'book-outline' | 'home-outline' | 'person-outline' | 'restaurant-outline' | 'snow-outline' {
+): 'book-outline' | 'home-outline' | 'restaurant-outline' | 'settings-outline' | 'snow-outline' {
   switch (routeName) {
     case 'fridge':
       return 'snow-outline';
@@ -57,8 +57,8 @@ function getTabIcon(
       return 'book-outline';
     case 'cook':
       return 'restaurant-outline';
-    case 'profile':
-      return 'person-outline';
+    case 'settings':
+      return 'settings-outline';
     case 'index':
     default:
       return 'home-outline';

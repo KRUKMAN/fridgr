@@ -15,6 +15,7 @@ import {
   IconButton,
   Input,
   ListItem,
+  MemberList,
   Modal,
   Spinner,
   useToast,
@@ -35,6 +36,32 @@ export function ComponentDemoRoute(): JSX.Element {
   const { showToast } = useToast();
 
   const iconColor = useMemo(() => theme.colors.primary, [theme.colors.primary]);
+  const mockMembers = useMemo(
+    () => [
+      {
+        avatar_url: null,
+        display_name: 'Maria Kowalska',
+        joined_at: '2026-04-18T10:00:00.000Z',
+        role: 'owner' as const,
+        user_id: 'user-owner',
+      },
+      {
+        avatar_url: null,
+        display_name: 'Alicja Zielinska',
+        joined_at: '2026-04-19T11:15:00.000Z',
+        role: 'member' as const,
+        user_id: 'user-member-a',
+      },
+      {
+        avatar_url: null,
+        display_name: 'Jakub Nowak',
+        joined_at: '2026-04-20T08:30:00.000Z',
+        role: 'member' as const,
+        user_id: 'user-member-b',
+      },
+    ],
+    [],
+  );
 
   if (!__DEV__) {
     return (
@@ -221,6 +248,18 @@ export function ComponentDemoRoute(): JSX.Element {
               <Avatar name="Jakub Nowak" size="md" />
               <Avatar name="Alicja Zielinska" size="lg" />
             </View>
+            <MemberList
+              currentUserId="user-owner"
+              currentUserRole="owner"
+              members={mockMembers}
+              onRemoveMember={(userId) =>
+                showToast({
+                  message: `Mock remove triggered for ${userId}.`,
+                  title: 'Member action',
+                  variant: 'info',
+                })
+              }
+            />
           </View>
         </Card>
 

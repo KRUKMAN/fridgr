@@ -193,6 +193,7 @@ export const decideLeavePolicy = ({
 const toHouseholdResponse = (household: HouseholdRecord) => ({
   archived_at: household.archived_at,
   id: household.id,
+  invite_code: household.invite_code,
   name: household.name,
   owner_id: household.owner_id,
 });
