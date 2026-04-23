@@ -14,7 +14,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "husky",
-    "test": "node --test test/ciSmoke.test.js && deno test --config supabase/functions/deno.json supabase/functions/_shared"
+    "verify:function-auth": "node scripts/verifyEdgeAuthImports.cjs",
+    "test": "node --test test/ciSmoke.test.js && deno test --config supabase/functions/deno.json supabase/functions/_shared supabase/functions/households"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
