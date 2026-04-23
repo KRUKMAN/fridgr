@@ -1,12 +1,27 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs, type Href } from 'expo-router';
+
+import { useMe } from '@hooks/useMe';
 
 import { useTheme } from '@theme';
 
-import type { JSX } from 'react';
+import type React from 'react';
 
-export default function TabsLayout(): JSX.Element {
+export default function TabsLayout(): React.JSX.Element | null {
   const theme = useTheme();
+  const meQuery = useMe();
+
+  if (meQuery.isLoading) {
+    return null;
+  }
+
+  if (meQuery.error?.status === 401) {
+    return <Redirect href="/(auth)/sign-in" />;
+  }
+
+  if ((meQuery.data?.households.length ?? 0) === 0) {
+    return <Redirect href={'/(app)/onboarding/create-household' as Href} />;
+  }
 
   return (
     <Tabs

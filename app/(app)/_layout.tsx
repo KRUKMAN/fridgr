@@ -4,8 +4,12 @@ import { useSessionStore } from '@stores/useSessionStore';
 
 import type React from 'react';
 
-export default function AppLayout(): React.JSX.Element {
+export default function AppLayout(): React.JSX.Element | null {
   const sessionStatus = useSessionStore((state) => state.status);
+
+  if (sessionStatus === 'loading') {
+    return null;
+  }
 
   if (sessionStatus !== 'authenticated') {
     return <Redirect href="/(auth)/sign-in" />;
