@@ -20,6 +20,8 @@ const getAppEnvironment = (): AppEnvironment => {
 export default ({ config }: ConfigContext): ExpoConfig => {
   const appEnvironment = getAppEnvironment();
   const isStaging = appEnvironment === 'staging';
+  const publicSupabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
+  const publicSupabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
 
   return {
     ...config,
@@ -28,7 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
-    userInterfaceStyle: 'light',
+    userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     splash: {
       image: './assets/splash-icon.png',
@@ -49,9 +51,18 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     web: {
       favicon: './assets/favicon.png',
     },
+    plugins: ['expo-router', 'expo-secure-store'],
+    experiments: {
+      typedRoutes: true,
+    },
     extra: {
       ...config.extra,
       appEnv: appEnvironment,
+      publicEnv: {
+        appEnv: appEnvironment,
+        supabaseAnonKey: publicSupabaseAnonKey,
+        supabaseUrl: publicSupabaseUrl,
+      },
     },
   };
 };

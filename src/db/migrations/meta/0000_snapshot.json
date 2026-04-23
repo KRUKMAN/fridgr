@@ -1,0 +1,2764 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "94d02185-0b81-4667-9eb2-edcdd9707535",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "ai_capture_items": {
+      "name": "ai_capture_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "raw_text": {
+          "name": "raw_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolved_scope": {
+          "name": "resolved_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolved_food_id": {
+          "name": "resolved_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolved_variation_id": {
+          "name": "resolved_variation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "quantity_raw": {
+          "name": "quantity_raw",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "quantity_base": {
+          "name": "quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "suggested_destination": {
+          "name": "suggested_destination",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "action": {
+          "name": "action",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "committed_diary_entry_id": {
+          "name": "committed_diary_entry_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "committed_inventory_item_id": {
+          "name": "committed_inventory_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "commit_error": {
+          "name": "commit_error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_capture_items_resolved_scope_check": {
+          "name": "ai_capture_items_resolved_scope_check",
+          "value": "\"ai_capture_items\".\"resolved_scope\" IS NULL OR \"ai_capture_items\".\"resolved_scope\" IN ('global', 'personal', 'household', 'variation', 'unknown')"
+        },
+        "ai_capture_items_base_unit_check": {
+          "name": "ai_capture_items_base_unit_check",
+          "value": "\"ai_capture_items\".\"base_unit\" IS NULL OR \"ai_capture_items\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "ai_capture_items_suggested_destination_check": {
+          "name": "ai_capture_items_suggested_destination_check",
+          "value": "\"ai_capture_items\".\"suggested_destination\" IS NULL OR \"ai_capture_items\".\"suggested_destination\" IN ('private_inventory', 'fridge', 'diary', 'none')"
+        }
+      }
+    },
+    "ai_capture_sessions": {
+      "name": "ai_capture_sessions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "capture_type": {
+          "name": "capture_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_image_url": {
+          "name": "source_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "raw_text": {
+          "name": "raw_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "committed_at": {
+          "name": "committed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "ai_capture_sessions_capture_type_check": {
+          "name": "ai_capture_sessions_capture_type_check",
+          "value": "\"ai_capture_sessions\".\"capture_type\" IN ('receipt', 'voice', 'barcode')"
+        },
+        "ai_capture_sessions_status_check": {
+          "name": "ai_capture_sessions_status_check",
+          "value": "\"ai_capture_sessions\".\"status\" IN ('parsing', 'parsed', 'clarifying', 'pending_confirmation', 'committed', 'canceled')"
+        }
+      }
+    },
+    "daily_summaries": {
+      "name": "daily_summaries",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "total_kcal": {
+          "name": "total_kcal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "total_protein_mg": {
+          "name": "total_protein_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "total_carbs_mg": {
+          "name": "total_carbs_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "total_fat_mg": {
+          "name": "total_fat_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "entry_count": {
+          "name": "entry_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "daily_summaries_user_id_date_key": {
+          "name": "daily_summaries_user_id_date_key",
+          "columns": ["user_id", "date"],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "diary_entries": {
+      "name": "diary_entries",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "food_name": {
+          "name": "food_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_scope": {
+          "name": "source_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_global_food_id": {
+          "name": "source_global_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_personal_food_id": {
+          "name": "source_personal_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_household_food_item_id": {
+          "name": "source_household_food_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_private_inventory_item_id": {
+          "name": "source_private_inventory_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_fridge_item_id": {
+          "name": "source_fridge_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_dish_batch_id": {
+          "name": "source_dish_batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "quantity_base": {
+          "name": "quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kcal": {
+          "name": "kcal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "protein_mg": {
+          "name": "protein_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "carbs_mg": {
+          "name": "carbs_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fat_mg": {
+          "name": "fat_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "is_quick_estimate": {
+          "name": "is_quick_estimate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "is_correction": {
+          "name": "is_correction",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "corrects_entry_id": {
+          "name": "corrects_entry_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "serve_split_event_id": {
+          "name": "serve_split_event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "logged_at": {
+          "name": "logged_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "diary_entries_source_scope_check": {
+          "name": "diary_entries_source_scope_check",
+          "value": "\"diary_entries\".\"source_scope\" IN ('global', 'personal', 'household', 'private_inventory', 'fridge', 'dish_batch', 'quick_estimate')"
+        },
+        "diary_entries_base_unit_check": {
+          "name": "diary_entries_base_unit_check",
+          "value": "\"diary_entries\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "diary_entries_correction_check": {
+          "name": "diary_entries_correction_check",
+          "value": "\"diary_entries\".\"is_correction\" = 0 OR \"diary_entries\".\"corrects_entry_id\" IS NOT NULL"
+        }
+      }
+    },
+    "dish_batch_ingredients": {
+      "name": "dish_batch_ingredients",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dish_batch_id": {
+          "name": "dish_batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_private_inventory_item_id": {
+          "name": "source_private_inventory_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_fridge_item_id": {
+          "name": "source_fridge_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_snapshot_food_name": {
+          "name": "source_snapshot_food_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quantity_used_base": {
+          "name": "quantity_used_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kcal_contributed": {
+          "name": "kcal_contributed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "protein_mg_contributed": {
+          "name": "protein_mg_contributed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "carbs_mg_contributed": {
+          "name": "carbs_mg_contributed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fat_mg_contributed": {
+          "name": "fat_mg_contributed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "dish_batch_ingredients_exactly_one_source_check": {
+          "name": "dish_batch_ingredients_exactly_one_source_check",
+          "value": "(\n        (CASE WHEN \"dish_batch_ingredients\".\"source_private_inventory_item_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"dish_batch_ingredients\".\"source_fridge_item_id\" IS NOT NULL THEN 1 ELSE 0 END)\n      ) = 1"
+        },
+        "dish_batch_ingredients_quantity_used_base_check": {
+          "name": "dish_batch_ingredients_quantity_used_base_check",
+          "value": "\"dish_batch_ingredients\".\"quantity_used_base\" > 0"
+        },
+        "dish_batch_ingredients_base_unit_check": {
+          "name": "dish_batch_ingredients_base_unit_check",
+          "value": "\"dish_batch_ingredients\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "dish_batch_ingredients_kcal_contributed_check": {
+          "name": "dish_batch_ingredients_kcal_contributed_check",
+          "value": "\"dish_batch_ingredients\".\"kcal_contributed\" >= 0"
+        },
+        "dish_batch_ingredients_protein_mg_contributed_check": {
+          "name": "dish_batch_ingredients_protein_mg_contributed_check",
+          "value": "\"dish_batch_ingredients\".\"protein_mg_contributed\" >= 0"
+        },
+        "dish_batch_ingredients_carbs_mg_contributed_check": {
+          "name": "dish_batch_ingredients_carbs_mg_contributed_check",
+          "value": "\"dish_batch_ingredients\".\"carbs_mg_contributed\" >= 0"
+        },
+        "dish_batch_ingredients_fat_mg_contributed_check": {
+          "name": "dish_batch_ingredients_fat_mg_contributed_check",
+          "value": "\"dish_batch_ingredients\".\"fat_mg_contributed\" >= 0"
+        }
+      }
+    },
+    "dish_batches": {
+      "name": "dish_batches",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "recipe_template_id": {
+          "name": "recipe_template_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "household_food_item_id": {
+          "name": "household_food_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "output_inventory_scope": {
+          "name": "output_inventory_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "output_inventory_item_id": {
+          "name": "output_inventory_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "output_quantity_base": {
+          "name": "output_quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nutrition_basis": {
+          "name": "nutrition_basis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kcal_total": {
+          "name": "kcal_total",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "protein_mg_total": {
+          "name": "protein_mg_total",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "carbs_mg_total": {
+          "name": "carbs_mg_total",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fat_mg_total": {
+          "name": "fat_mg_total",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "dish_batches_output_inventory_scope_check": {
+          "name": "dish_batches_output_inventory_scope_check",
+          "value": "\"dish_batches\".\"output_inventory_scope\" IN ('private_inventory', 'fridge')"
+        },
+        "dish_batches_output_quantity_base_check": {
+          "name": "dish_batches_output_quantity_base_check",
+          "value": "\"dish_batches\".\"output_quantity_base\" > 0"
+        },
+        "dish_batches_base_unit_check": {
+          "name": "dish_batches_base_unit_check",
+          "value": "\"dish_batches\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "dish_batches_nutrition_basis_check": {
+          "name": "dish_batches_nutrition_basis_check",
+          "value": "\"dish_batches\".\"nutrition_basis\" IN ('per_100g', 'per_100ml')"
+        },
+        "dish_batches_kcal_total_check": {
+          "name": "dish_batches_kcal_total_check",
+          "value": "\"dish_batches\".\"kcal_total\" >= 0"
+        },
+        "dish_batches_protein_mg_total_check": {
+          "name": "dish_batches_protein_mg_total_check",
+          "value": "\"dish_batches\".\"protein_mg_total\" >= 0"
+        },
+        "dish_batches_carbs_mg_total_check": {
+          "name": "dish_batches_carbs_mg_total_check",
+          "value": "\"dish_batches\".\"carbs_mg_total\" >= 0"
+        },
+        "dish_batches_fat_mg_total_check": {
+          "name": "dish_batches_fat_mg_total_check",
+          "value": "\"dish_batches\".\"fat_mg_total\" >= 0"
+        },
+        "dish_batches_status_check": {
+          "name": "dish_batches_status_check",
+          "value": "\"dish_batches\".\"status\" IN ('draft', 'finalized', 'partially_consumed', 'consumed', 'discarded')"
+        }
+      }
+    },
+    "food_variations": {
+      "name": "food_variations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "canonical_food_id": {
+          "name": "canonical_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "scope": {
+          "name": "scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'personal'"
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'unresolved'"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "brand": {
+          "name": "brand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "barcode": {
+          "name": "barcode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nutrition_basis": {
+          "name": "nutrition_basis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'per_100g'"
+        },
+        "density_mg_per_ml": {
+          "name": "density_mg_per_ml",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "kcal_per_100_unit": {
+          "name": "kcal_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "protein_mg_per_100_unit": {
+          "name": "protein_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "carbs_mg_per_100_unit": {
+          "name": "carbs_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fat_mg_per_100_unit": {
+          "name": "fat_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "evidence_count": {
+          "name": "evidence_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "source_context": {
+          "name": "source_context",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "food_variations_scope_check": {
+          "name": "food_variations_scope_check",
+          "value": "\"food_variations\".\"scope\" IN ('personal', 'household', 'community')"
+        },
+        "food_variations_status_check": {
+          "name": "food_variations_status_check",
+          "value": "\"food_variations\".\"status\" IN ('unresolved', 'confirmed', 'promoted')"
+        },
+        "food_variations_nutrition_basis_check": {
+          "name": "food_variations_nutrition_basis_check",
+          "value": "\"food_variations\".\"nutrition_basis\" IN ('per_100g', 'per_100ml')"
+        },
+        "food_variations_source_context_check": {
+          "name": "food_variations_source_context_check",
+          "value": "\"food_variations\".\"source_context\" IS NULL OR \"food_variations\".\"source_context\" IN ('receipt_parse', 'voice_parse', 'manual_add', 'barcode_scan')"
+        }
+      }
+    },
+    "fridge_items": {
+      "name": "fridge_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "global_food_id": {
+          "name": "global_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "personal_food_id": {
+          "name": "personal_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "household_food_item_id": {
+          "name": "household_food_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "dish_batch_id": {
+          "name": "dish_batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "food_variation_id": {
+          "name": "food_variation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "snapshot_food_name": {
+          "name": "snapshot_food_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_nutrition_basis": {
+          "name": "snapshot_nutrition_basis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_kcal_per_100_unit": {
+          "name": "snapshot_kcal_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_protein_mg_per_100_unit": {
+          "name": "snapshot_protein_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_carbs_mg_per_100_unit": {
+          "name": "snapshot_carbs_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_fat_mg_per_100_unit": {
+          "name": "snapshot_fat_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_category": {
+          "name": "snapshot_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "snapshot_density_mg_per_ml": {
+          "name": "snapshot_density_mg_per_ml",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "quantity_base": {
+          "name": "quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unit_display": {
+          "name": "unit_display",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "estimated_expiry": {
+          "name": "estimated_expiry",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "added_by": {
+          "name": "added_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "fridge_items_snapshot_nutrition_basis_check": {
+          "name": "fridge_items_snapshot_nutrition_basis_check",
+          "value": "\"fridge_items\".\"snapshot_nutrition_basis\" IN ('per_100g', 'per_100ml')"
+        },
+        "fridge_items_quantity_base_check": {
+          "name": "fridge_items_quantity_base_check",
+          "value": "\"fridge_items\".\"quantity_base\" > 0"
+        },
+        "fridge_items_base_unit_check": {
+          "name": "fridge_items_base_unit_check",
+          "value": "\"fridge_items\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "fridge_items_exactly_one_source_check": {
+          "name": "fridge_items_exactly_one_source_check",
+          "value": "(\n        (CASE WHEN \"fridge_items\".\"global_food_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"fridge_items\".\"personal_food_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"fridge_items\".\"household_food_item_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"fridge_items\".\"dish_batch_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"fridge_items\".\"food_variation_id\" IS NOT NULL THEN 1 ELSE 0 END)\n      ) = 1"
+        }
+      }
+    },
+    "global_food_items": {
+      "name": "global_food_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "canonical_name": {
+          "name": "canonical_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "brand": {
+          "name": "brand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "barcode": {
+          "name": "barcode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nutrition_basis": {
+          "name": "nutrition_basis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'per_100g'"
+        },
+        "density_mg_per_ml": {
+          "name": "density_mg_per_ml",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "kcal_per_100_unit": {
+          "name": "kcal_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "protein_mg_per_100_unit": {
+          "name": "protein_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "carbs_mg_per_100_unit": {
+          "name": "carbs_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fat_mg_per_100_unit": {
+          "name": "fat_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fiber_mg_per_100_unit": {
+          "name": "fiber_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "default_serving_g": {
+          "name": "default_serving_g",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "default_shelf_life_days": {
+          "name": "default_shelf_life_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_type": {
+          "name": "source_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quality_score": {
+          "name": "quality_score",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "global_food_items_nutrition_basis_check": {
+          "name": "global_food_items_nutrition_basis_check",
+          "value": "\"global_food_items\".\"nutrition_basis\" IN ('per_100g', 'per_100ml')"
+        },
+        "global_food_items_source_type_check": {
+          "name": "global_food_items_source_type_check",
+          "value": "\"global_food_items\".\"source_type\" IN ('imported', 'verified_user_submission', 'curated')"
+        }
+      }
+    },
+    "household_food_items": {
+      "name": "household_food_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "source_global_food_id": {
+          "name": "source_global_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_personal_food_id": {
+          "name": "source_personal_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nutrition_basis": {
+          "name": "nutrition_basis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'per_100g'"
+        },
+        "density_mg_per_ml": {
+          "name": "density_mg_per_ml",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "kcal_per_100_unit": {
+          "name": "kcal_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "protein_mg_per_100_unit": {
+          "name": "protein_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "carbs_mg_per_100_unit": {
+          "name": "carbs_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fat_mg_per_100_unit": {
+          "name": "fat_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "default_unit_display": {
+          "name": "default_unit_display",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "sharing_mode": {
+          "name": "sharing_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "household_food_items_kind_check": {
+          "name": "household_food_items_kind_check",
+          "value": "\"household_food_items\".\"kind\" IN ('product', 'dish')"
+        },
+        "household_food_items_nutrition_basis_check": {
+          "name": "household_food_items_nutrition_basis_check",
+          "value": "\"household_food_items\".\"nutrition_basis\" IN ('per_100g', 'per_100ml')"
+        },
+        "household_food_items_sharing_mode_check": {
+          "name": "household_food_items_sharing_mode_check",
+          "value": "\"household_food_items\".\"sharing_mode\" IN ('direct', 'promoted_from_personal', 'promoted_from_global', 'generated_from_recipe')"
+        }
+      }
+    },
+    "household_members": {
+      "name": "household_members",
+      "columns": {
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'member'"
+        },
+        "joined_at": {
+          "name": "joined_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "household_members_household_id_user_id_pk": {
+          "columns": ["household_id", "user_id"],
+          "name": "household_members_household_id_user_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "household_members_role_check": {
+          "name": "household_members_role_check",
+          "value": "\"household_members\".\"role\" IN ('owner', 'member')"
+        }
+      }
+    },
+    "households": {
+      "name": "households",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "invite_code": {
+          "name": "invite_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "personal_food_items": {
+      "name": "personal_food_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nutrition_basis": {
+          "name": "nutrition_basis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'per_100g'"
+        },
+        "density_mg_per_ml": {
+          "name": "density_mg_per_ml",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "kcal_per_100_unit": {
+          "name": "kcal_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "protein_mg_per_100_unit": {
+          "name": "protein_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "carbs_mg_per_100_unit": {
+          "name": "carbs_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fat_mg_per_100_unit": {
+          "name": "fat_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "linked_global_id": {
+          "name": "linked_global_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "personal_food_items_nutrition_basis_check": {
+          "name": "personal_food_items_nutrition_basis_check",
+          "value": "\"personal_food_items\".\"nutrition_basis\" IN ('per_100g', 'per_100ml')"
+        }
+      }
+    },
+    "private_inventory_items": {
+      "name": "private_inventory_items",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "global_food_id": {
+          "name": "global_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "personal_food_id": {
+          "name": "personal_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "household_food_item_id": {
+          "name": "household_food_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "dish_batch_id": {
+          "name": "dish_batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "food_variation_id": {
+          "name": "food_variation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "snapshot_food_name": {
+          "name": "snapshot_food_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_nutrition_basis": {
+          "name": "snapshot_nutrition_basis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_kcal_per_100_unit": {
+          "name": "snapshot_kcal_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_protein_mg_per_100_unit": {
+          "name": "snapshot_protein_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_carbs_mg_per_100_unit": {
+          "name": "snapshot_carbs_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_fat_mg_per_100_unit": {
+          "name": "snapshot_fat_mg_per_100_unit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "snapshot_category": {
+          "name": "snapshot_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "snapshot_density_mg_per_ml": {
+          "name": "snapshot_density_mg_per_ml",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "quantity_base": {
+          "name": "quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "unit_display": {
+          "name": "unit_display",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "storage_label": {
+          "name": "storage_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "estimated_expiry": {
+          "name": "estimated_expiry",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "version": {
+          "name": "version",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
+        "added_by": {
+          "name": "added_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "private_inventory_items_snapshot_nutrition_basis_check": {
+          "name": "private_inventory_items_snapshot_nutrition_basis_check",
+          "value": "\"private_inventory_items\".\"snapshot_nutrition_basis\" IN ('per_100g', 'per_100ml')"
+        },
+        "private_inventory_items_quantity_base_check": {
+          "name": "private_inventory_items_quantity_base_check",
+          "value": "\"private_inventory_items\".\"quantity_base\" > 0"
+        },
+        "private_inventory_items_base_unit_check": {
+          "name": "private_inventory_items_base_unit_check",
+          "value": "\"private_inventory_items\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "private_inventory_items_exactly_one_source_check": {
+          "name": "private_inventory_items_exactly_one_source_check",
+          "value": "(\n        (CASE WHEN \"private_inventory_items\".\"global_food_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"private_inventory_items\".\"personal_food_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"private_inventory_items\".\"household_food_item_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"private_inventory_items\".\"dish_batch_id\" IS NOT NULL THEN 1 ELSE 0 END) +\n        (CASE WHEN \"private_inventory_items\".\"food_variation_id\" IS NOT NULL THEN 1 ELSE 0 END)\n      ) = 1"
+        }
+      }
+    },
+    "recipe_template_ingredients": {
+      "name": "recipe_template_ingredients",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "recipe_template_id": {
+          "name": "recipe_template_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "preferred_scope": {
+          "name": "preferred_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "global_food_id": {
+          "name": "global_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "personal_food_id": {
+          "name": "personal_food_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "household_food_item_id": {
+          "name": "household_food_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "quantity_base": {
+          "name": "quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "recipe_template_ingredients_preferred_scope_check": {
+          "name": "recipe_template_ingredients_preferred_scope_check",
+          "value": "\"recipe_template_ingredients\".\"preferred_scope\" IN ('global', 'personal', 'household')"
+        },
+        "recipe_template_ingredients_matching_source_check": {
+          "name": "recipe_template_ingredients_matching_source_check",
+          "value": "(\n        (\"recipe_template_ingredients\".\"preferred_scope\" = 'global' AND \"recipe_template_ingredients\".\"global_food_id\" IS NOT NULL AND \"recipe_template_ingredients\".\"personal_food_id\" IS NULL AND \"recipe_template_ingredients\".\"household_food_item_id\" IS NULL) OR\n        (\"recipe_template_ingredients\".\"preferred_scope\" = 'personal' AND \"recipe_template_ingredients\".\"global_food_id\" IS NULL AND \"recipe_template_ingredients\".\"personal_food_id\" IS NOT NULL AND \"recipe_template_ingredients\".\"household_food_item_id\" IS NULL) OR\n        (\"recipe_template_ingredients\".\"preferred_scope\" = 'household' AND \"recipe_template_ingredients\".\"global_food_id\" IS NULL AND \"recipe_template_ingredients\".\"personal_food_id\" IS NULL AND \"recipe_template_ingredients\".\"household_food_item_id\" IS NOT NULL)\n      )"
+        },
+        "recipe_template_ingredients_quantity_base_check": {
+          "name": "recipe_template_ingredients_quantity_base_check",
+          "value": "\"recipe_template_ingredients\".\"quantity_base\" > 0"
+        },
+        "recipe_template_ingredients_base_unit_check": {
+          "name": "recipe_template_ingredients_base_unit_check",
+          "value": "\"recipe_template_ingredients\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        }
+      }
+    },
+    "recipe_templates": {
+      "name": "recipe_templates",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_scope": {
+          "name": "owner_scope",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_user_id": {
+          "name": "owner_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "owner_household_id": {
+          "name": "owner_household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "household_food_item_id": {
+          "name": "household_food_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "default_output_quantity_base": {
+          "name": "default_output_quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "default_output_base_unit": {
+          "name": "default_output_base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_from_dish_batch_id": {
+          "name": "created_from_dish_batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "recipe_templates_owner_scope_check": {
+          "name": "recipe_templates_owner_scope_check",
+          "value": "\"recipe_templates\".\"owner_scope\" IN ('personal', 'household')"
+        },
+        "recipe_templates_owner_check": {
+          "name": "recipe_templates_owner_check",
+          "value": "(\n        (\"recipe_templates\".\"owner_scope\" = 'personal' AND \"recipe_templates\".\"owner_user_id\" IS NOT NULL AND \"recipe_templates\".\"owner_household_id\" IS NULL) OR\n        (\"recipe_templates\".\"owner_scope\" = 'household' AND \"recipe_templates\".\"owner_household_id\" IS NOT NULL)\n      )"
+        },
+        "recipe_templates_default_output_quantity_base_check": {
+          "name": "recipe_templates_default_output_quantity_base_check",
+          "value": "\"recipe_templates\".\"default_output_quantity_base\" IS NULL OR \"recipe_templates\".\"default_output_quantity_base\" > 0"
+        },
+        "recipe_templates_default_output_base_unit_check": {
+          "name": "recipe_templates_default_output_base_unit_check",
+          "value": "\"recipe_templates\".\"default_output_base_unit\" IS NULL OR \"recipe_templates\".\"default_output_base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "recipe_templates_default_output_pair_check": {
+          "name": "recipe_templates_default_output_pair_check",
+          "value": "(\n        (\"recipe_templates\".\"default_output_quantity_base\" IS NULL AND \"recipe_templates\".\"default_output_base_unit\" IS NULL) OR\n        (\"recipe_templates\".\"default_output_quantity_base\" IS NOT NULL AND \"recipe_templates\".\"default_output_base_unit\" IS NOT NULL)\n      )"
+        }
+      }
+    },
+    "serve_split_events": {
+      "name": "serve_split_events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "household_id": {
+          "name": "household_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dish_batch_id": {
+          "name": "dish_batch_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "total_quantity_base": {
+          "name": "total_quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "total_kcal": {
+          "name": "total_kcal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "total_protein_mg": {
+          "name": "total_protein_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "total_carbs_mg": {
+          "name": "total_carbs_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "total_fat_mg": {
+          "name": "total_fat_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "serve_split_events_total_quantity_base_check": {
+          "name": "serve_split_events_total_quantity_base_check",
+          "value": "\"serve_split_events\".\"total_quantity_base\" > 0"
+        },
+        "serve_split_events_base_unit_check": {
+          "name": "serve_split_events_base_unit_check",
+          "value": "\"serve_split_events\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "serve_split_events_total_kcal_check": {
+          "name": "serve_split_events_total_kcal_check",
+          "value": "\"serve_split_events\".\"total_kcal\" >= 0"
+        },
+        "serve_split_events_total_protein_mg_check": {
+          "name": "serve_split_events_total_protein_mg_check",
+          "value": "\"serve_split_events\".\"total_protein_mg\" >= 0"
+        },
+        "serve_split_events_total_carbs_mg_check": {
+          "name": "serve_split_events_total_carbs_mg_check",
+          "value": "\"serve_split_events\".\"total_carbs_mg\" >= 0"
+        },
+        "serve_split_events_total_fat_mg_check": {
+          "name": "serve_split_events_total_fat_mg_check",
+          "value": "\"serve_split_events\".\"total_fat_mg\" >= 0"
+        },
+        "serve_split_events_status_check": {
+          "name": "serve_split_events_status_check",
+          "value": "\"serve_split_events\".\"status\" IN ('pending', 'completed', 'expired')"
+        }
+      }
+    },
+    "serve_split_portions": {
+      "name": "serve_split_portions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "percentage": {
+          "name": "percentage",
+          "type": "real",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "quantity_base": {
+          "name": "quantity_base",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "base_unit": {
+          "name": "base_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kcal": {
+          "name": "kcal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "protein_mg": {
+          "name": "protein_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "carbs_mg": {
+          "name": "carbs_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fat_mg": {
+          "name": "fat_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "diary_entry_id": {
+          "name": "diary_entry_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "responded_at": {
+          "name": "responded_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "serve_split_portions_percentage_check": {
+          "name": "serve_split_portions_percentage_check",
+          "value": "\"serve_split_portions\".\"percentage\" IS NULL OR (\"serve_split_portions\".\"percentage\" > 0 AND \"serve_split_portions\".\"percentage\" <= 100)"
+        },
+        "serve_split_portions_quantity_base_check": {
+          "name": "serve_split_portions_quantity_base_check",
+          "value": "\"serve_split_portions\".\"quantity_base\" > 0"
+        },
+        "serve_split_portions_base_unit_check": {
+          "name": "serve_split_portions_base_unit_check",
+          "value": "\"serve_split_portions\".\"base_unit\" IN ('mass_mg', 'volume_ml', 'count_each')"
+        },
+        "serve_split_portions_kcal_check": {
+          "name": "serve_split_portions_kcal_check",
+          "value": "\"serve_split_portions\".\"kcal\" >= 0"
+        },
+        "serve_split_portions_protein_mg_check": {
+          "name": "serve_split_portions_protein_mg_check",
+          "value": "\"serve_split_portions\".\"protein_mg\" >= 0"
+        },
+        "serve_split_portions_carbs_mg_check": {
+          "name": "serve_split_portions_carbs_mg_check",
+          "value": "\"serve_split_portions\".\"carbs_mg\" >= 0"
+        },
+        "serve_split_portions_fat_mg_check": {
+          "name": "serve_split_portions_fat_mg_check",
+          "value": "\"serve_split_portions\".\"fat_mg\" >= 0"
+        },
+        "serve_split_portions_status_check": {
+          "name": "serve_split_portions_status_check",
+          "value": "\"serve_split_portions\".\"status\" IN ('pending', 'accepted', 'declined')"
+        }
+      }
+    },
+    "users": {
+      "name": "users",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "target_kcal": {
+          "name": "target_kcal",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 2000
+        },
+        "target_protein_mg": {
+          "name": "target_protein_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "target_carbs_mg": {
+          "name": "target_carbs_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "target_fat_mg": {
+          "name": "target_fat_mg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "last_active_at": {
+          "name": "last_active_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "synced_at": {
+          "name": "synced_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "_pending_mutation": {
+          "name": "_pending_mutation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}
