@@ -4,3 +4,4 @@ dist/
 android/
 ios/
 babel.config.js
+supabase/functions/
