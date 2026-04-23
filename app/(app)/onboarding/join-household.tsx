@@ -2,12 +2,12 @@
 
 import { Text, View } from 'react-native';
 
-import { Card } from '@components';
+import { Button, Card } from '@components';
 import { useTheme } from '@theme';
 
 import type { JSX } from 'react';
 
-export default function AppPlaceholderScreen(): JSX.Element {
+export default function JoinHouseholdPlaceholder(): JSX.Element {
   const theme = useTheme();
 
   return (
@@ -21,7 +21,7 @@ export default function AppPlaceholderScreen(): JSX.Element {
       }}
     >
       <Card padding="lg">
-        <View style={{ gap: theme.spacing.sm }}>
+        <View style={{ gap: theme.spacing.md }}>
           <Text
             allowFontScaling
             style={{
@@ -34,7 +34,7 @@ export default function AppPlaceholderScreen(): JSX.Element {
               textTransform: 'uppercase',
             }}
           >
-            Fridgr Shell
+            Onboarding
           </Text>
           <Text
             allowFontScaling
@@ -46,7 +46,7 @@ export default function AppPlaceholderScreen(): JSX.Element {
               textAlign: 'center',
             }}
           >
-            Authenticated app placeholder
+            Join household placeholder
           </Text>
           <Text
             allowFontScaling
@@ -58,8 +58,9 @@ export default function AppPlaceholderScreen(): JSX.Element {
               textAlign: 'center',
             }}
           >
-            Batch 2 will hang onboarding and tabs under this group.
+            Batch 4 will wire invite-code entry and household membership checks here.
           </Text>
+          <Button label="Back to create" variant="secondary" />
         </View>
       </Card>
     </View>

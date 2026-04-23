@@ -1,41 +1,19 @@
-/* eslint-disable react-native/no-inline-styles */
+import { Redirect, type Href } from 'expo-router';
 
-import { Redirect } from 'expo-router';
-import { Text, View } from 'react-native';
-
-import { useTheme } from '@theme';
+import { useSessionStore } from '@stores/useSessionStore';
 
 import type { JSX } from 'react';
 
-export default function IndexRoute(): JSX.Element {
-  const theme = useTheme();
+export default function IndexRoute(): JSX.Element | null {
+  const sessionStatus = useSessionStore((state) => state.status);
 
-  if (__DEV__) {
-    return <Redirect href="/_demo/components" />;
+  if (sessionStatus === 'loading') {
+    return null;
   }
 
-  return (
-    <View
-      style={{
-        alignItems: 'center',
-        backgroundColor: theme.colors.background,
-        flex: 1,
-        justifyContent: 'center',
-        padding: theme.spacing.xl,
-      }}
-    >
-      <Text
-        allowFontScaling
-        style={{
-          color: theme.colors.text,
-          fontSize: theme.typography.body.fontSize,
-          fontWeight: theme.typography.body.fontWeight,
-          lineHeight: theme.typography.body.lineHeight,
-          textAlign: 'center',
-        }}
-      >
-        Fridgr app shell is in progress.
-      </Text>
-    </View>
-  );
+  if (sessionStatus === 'authenticated') {
+    return <Redirect href={'/(app)/onboarding/create-household' as Href} />;
+  }
+
+  return <Redirect href="/(auth)/sign-in" />;
 }

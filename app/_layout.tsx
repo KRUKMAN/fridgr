@@ -2,18 +2,24 @@
 
 import 'react-native-gesture-handler';
 
-import { Slot } from 'expo-router';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { supabase } from '@lib/supabase';
+import { useSessionStore } from '@stores/useSessionStore';
+
 import { FridgrBottomSheetProvider, Spinner, ToastProvider } from '@components';
 import { ensureDatabaseReady } from '@db/client';
 import { ThemeProvider, useTheme } from '@theme';
 
-import type { JSX, PropsWithChildren } from 'react';
+import type { JSX } from 'react';
+
+void SplashScreen.preventAutoHideAsync().catch(() => undefined);
 
 export default function RootLayout(): JSX.Element {
   return (
@@ -22,10 +28,7 @@ export default function RootLayout(): JSX.Element {
         <ThemeProvider>
           <FridgrBottomSheetProvider>
             <ToastProvider>
-              <DatabaseBootstrap>
-                <Slot />
-                <StatusBar style="auto" />
-              </DatabaseBootstrap>
+              <AppBootstrap />
             </ToastProvider>
           </FridgrBottomSheetProvider>
         </ThemeProvider>
@@ -34,109 +37,146 @@ export default function RootLayout(): JSX.Element {
   );
 }
 
-function DatabaseBootstrap({ children }: PropsWithChildren): JSX.Element {
-  const theme = useTheme();
-  const [isReady, setIsReady] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+function AppBootstrap(): JSX.Element {
+  const [isDatabaseReady, setIsDatabaseReady] = useState(false);
+  const [databaseError, setDatabaseError] = useState<string | null>(null);
+  const sessionStatus = useSessionStore((state) => state.status);
+  const setAuthenticated = useSessionStore((state) => state.setAuthenticated);
+  const setLoading = useSessionStore((state) => state.setLoading);
+  const setUnauthenticated = useSessionStore((state) => state.setUnauthenticated);
 
   useEffect(() => {
     let isMounted = true;
 
     const bootstrap = async (): Promise<void> => {
+      setLoading();
+
       try {
         await ensureDatabaseReady();
 
-        if (!isMounted) {
-          return;
+        if (isMounted) {
+          setIsDatabaseReady(true);
         }
-
-        setIsReady(true);
       } catch (error) {
-        if (!isMounted) {
-          return;
+        if (isMounted) {
+          setDatabaseError(
+            error instanceof Error ? error.message : 'Local database bootstrap failed.',
+          );
         }
+      }
 
-        setErrorMessage(
-          error instanceof Error ? error.message : 'Local database bootstrap failed.',
-        );
+      const {
+        data: { session: initialSession },
+      } = await supabase.auth.getSession();
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (initialSession) {
+        setAuthenticated(initialSession);
+      } else {
+        setUnauthenticated();
       }
     };
 
     void bootstrap();
 
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (nextSession) {
+        setAuthenticated(nextSession);
+        return;
+      }
+
+      setUnauthenticated();
+    });
+
     return () => {
       isMounted = false;
+      subscription.unsubscribe();
     };
-  }, []);
+  }, [setAuthenticated, setLoading, setUnauthenticated]);
 
-  if (errorMessage) {
+  useEffect(() => {
+    if (!isDatabaseReady || sessionStatus === 'loading') {
+      return;
+    }
+
+    void SplashScreen.hideAsync().catch(() => undefined);
+  }, [isDatabaseReady, sessionStatus]);
+
+  if (databaseError) {
     return (
-      <View
-        style={{
-          alignItems: 'center',
-          backgroundColor: theme.colors.background,
-          flex: 1,
-          gap: theme.spacing.md,
-          justifyContent: 'center',
-          padding: theme.spacing.xl,
-        }}
-      >
-        <Text
-          allowFontScaling
-          style={{
-            color: theme.colors.destructive,
-            fontSize: theme.typography.heading.fontSize,
-            fontWeight: theme.typography.heading.fontWeight,
-            lineHeight: theme.typography.heading.lineHeight,
-            textAlign: 'center',
-          }}
-        >
-          Database bootstrap failed
-        </Text>
-        <Text
-          allowFontScaling
-          style={{
-            color: theme.colors.textMuted,
-            fontSize: theme.typography.body.fontSize,
-            fontWeight: theme.typography.body.fontWeight,
-            lineHeight: theme.typography.body.lineHeight,
-            textAlign: 'center',
-          }}
-        >
-          {errorMessage}
-        </Text>
-      </View>
+      <BootstrapMessage message={databaseError} title="Database bootstrap failed" variant="error" />
     );
   }
 
-  if (!isReady) {
-    return (
-      <View
-        style={{
-          alignItems: 'center',
-          backgroundColor: theme.colors.background,
-          flex: 1,
-          gap: theme.spacing.md,
-          justifyContent: 'center',
-          padding: theme.spacing.xl,
-        }}
-      >
-        <Spinner size="large" />
-        <Text
-          allowFontScaling
-          style={{
-            color: theme.colors.textMuted,
-            fontSize: theme.typography.body.fontSize,
-            fontWeight: theme.typography.body.fontWeight,
-            lineHeight: theme.typography.body.lineHeight,
-            textAlign: 'center',
-          }}
-        >
-          Preparing local database…
-        </Text>
-      </View>
-    );
+  if (!isDatabaseReady || sessionStatus === 'loading') {
+    return <BootstrapMessage message="Preparing Fridgr..." title="Loading" variant="loading" />;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <StatusBar style="auto" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(app)" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    </>
+  );
+}
+
+function BootstrapMessage({
+  message,
+  title,
+  variant,
+}: Readonly<{
+  message: string;
+  title: string;
+  variant: 'error' | 'loading';
+}>): JSX.Element {
+  const theme = useTheme();
+
+  return (
+    <View
+      style={{
+        alignItems: 'center',
+        backgroundColor: theme.colors.background,
+        flex: 1,
+        gap: theme.spacing.md,
+        justifyContent: 'center',
+        padding: theme.spacing.xl,
+      }}
+    >
+      {variant === 'loading' ? <Spinner size="large" /> : null}
+      <Text
+        allowFontScaling
+        style={{
+          color: variant === 'error' ? theme.colors.destructive : theme.colors.text,
+          fontSize: theme.typography.heading.fontSize,
+          fontWeight: theme.typography.heading.fontWeight,
+          lineHeight: theme.typography.heading.lineHeight,
+          textAlign: 'center',
+        }}
+      >
+        {title}
+      </Text>
+      <Text
+        allowFontScaling
+        style={{
+          color: theme.colors.textMuted,
+          fontSize: theme.typography.body.fontSize,
+          fontWeight: theme.typography.body.fontWeight,
+          lineHeight: theme.typography.body.lineHeight,
+          textAlign: 'center',
+        }}
+      >
+        {message}
+      </Text>
+    </View>
+  );
 }
