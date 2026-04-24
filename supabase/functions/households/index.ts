@@ -69,6 +69,11 @@ type UserHouseholdRow = Readonly<{
         archived_at: string | null;
         id: string;
         name: string;
+      }>
+    | Readonly<{
+        archived_at: string | null;
+        id: string;
+        name: string;
       }>[]
     | null;
   role: HouseholdRole;
@@ -206,6 +211,20 @@ const toMemberResponse = (row: HouseholdMemberRow) => ({
   user_id: row.user_id,
 });
 
+const getEmbeddedHousehold = (
+  households: UserHouseholdRow['households'],
+): Readonly<{
+  archived_at: string | null;
+  id: string;
+  name: string;
+}> | null => {
+  if (!households) {
+    return null;
+  }
+
+  return Array.isArray(households) ? (households[0] ?? null) : households;
+};
+
 const ensureOwner = (context: HouseholdContext): Response | null => {
   if (context.role === 'owner') {
     return null;
@@ -301,6 +320,7 @@ const createHouseholdWithInvite = async (
 
 const handleUsersMe = async (request: Request): Promise<Response> =>
   withAuth(request, async (_authenticatedRequest, context) => {
+    const service = getServiceClient();
     const { data: user, error: userError } = await context.supabase
       .from('users')
       .select(
@@ -335,7 +355,7 @@ const handleUsersMe = async (request: Request): Promise<Response> =>
 
     await updateLastActiveAt(context);
 
-    const { data: memberships, error: membershipError } = await context.supabase
+    const { data: memberships, error: membershipError } = await service
       .from('household_members')
       .select('household_id, role, households!inner(id, name, archived_at)')
       .eq('user_id', context.user_id)
@@ -352,10 +372,15 @@ const handleUsersMe = async (request: Request): Promise<Response> =>
     }
 
     const households = ((memberships ?? []) as UserHouseholdRow[])
-      .filter((membership) => membership.households?.[0]?.archived_at === null)
       .map((membership) => ({
-        id: membership.households?.[0]?.id ?? membership.household_id,
-        name: membership.households?.[0]?.name ?? '',
+        household: getEmbeddedHousehold(membership.households),
+        role: membership.role,
+        household_id: membership.household_id,
+      }))
+      .filter((membership) => membership.household?.archived_at === null)
+      .map((membership) => ({
+        id: membership.household?.id ?? membership.household_id,
+        name: membership.household?.name ?? '',
         role: membership.role,
       }));
 
