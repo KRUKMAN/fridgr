@@ -1,6 +1,8 @@
 import { z } from 'npm:zod@3.25.76';
 
-import { BaseUnit, UuidV4 } from '../../helpers/validate.ts';
+import { UuidV4 } from '../../helpers/validate.ts';
+
+const ServingBaseUnit = z.enum(['g', 'ml', 'count']);
 
 const NutritionFieldsSchema = z
   .object({
@@ -33,7 +35,7 @@ export const createPersonalFoodSchema = z
     linked_global_id: UuidV4.optional(),
     name: z.string().trim().min(1),
     protein_mg_per_base: z.number().int().nonnegative(),
-    serving_base_unit: BaseUnit,
+    serving_base_unit: ServingBaseUnit,
   })
   .strict();
 

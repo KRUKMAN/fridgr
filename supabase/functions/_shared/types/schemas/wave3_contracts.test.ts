@@ -15,7 +15,7 @@ Deno.test('Wave 3 personal food schema uses flat API contract fields', () => {
     linked_global_id: id,
     name: 'Contract Yogurt',
     protein_mg_per_base: 10000,
-    serving_base_unit: 'mass_mg',
+    serving_base_unit: 'g',
   });
 
   assertEquals(parsed.success, true);
