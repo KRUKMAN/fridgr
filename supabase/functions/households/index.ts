@@ -50,6 +50,31 @@ type LeavePolicyDecision =
       type: 'block';
     }>;
 
+type HouseholdLeaveService = Readonly<{
+  archiveHousehold: (
+    householdId: string,
+    archivedAt: string,
+  ) => Promise<{
+    error: unknown | null;
+  }>;
+  deleteMembership: (
+    householdId: string,
+    userId: string,
+  ) => Promise<{
+    error: unknown | null;
+  }>;
+  expirePendingServeSplits: (
+    householdId: string,
+    userId: string,
+  ) => Promise<{
+    error: unknown | null;
+  }>;
+  listMembershipRoles: (householdId: string) => Promise<{
+    data: ReadonlyArray<Readonly<{ role: HouseholdRole }>> | null;
+    error: unknown | null;
+  }>;
+}>;
+
 type UserProfile = Readonly<{
   avatar_url: string | null;
   display_name: string | null;
@@ -193,6 +218,117 @@ export const decideLeavePolicy = ({
     archive_household: false,
     type: 'allow',
   };
+};
+
+const createHouseholdLeaveService = (): HouseholdLeaveService => {
+  const service = getServiceClient();
+
+  return {
+    archiveHousehold: async (householdId, archivedAt) =>
+      await service
+        .from('households')
+        .update({
+          archived_at: archivedAt,
+        })
+        .eq('id', householdId),
+    deleteMembership: async (householdId, userId) =>
+      await service
+        .from('household_members')
+        .delete()
+        .eq('household_id', householdId)
+        .eq('user_id', userId),
+    expirePendingServeSplits: async (householdId, userId) =>
+      await service
+        .from('serve_split_events')
+        .update({
+          status: 'expired',
+        })
+        .eq('household_id', householdId)
+        .eq('created_by', userId)
+        .eq('status', 'pending'),
+    listMembershipRoles: async (householdId) =>
+      await service.from('household_members').select('role').eq('household_id', householdId),
+  };
+};
+
+export const executeLeaveHousehold = async (
+  service: HouseholdLeaveService,
+  context: Pick<HouseholdContext, 'household_id' | 'operation_id' | 'role' | 'user_id'>,
+): Promise<Response> => {
+  const { data: membershipCounts, error: countError } = await service.listMembershipRoles(
+    context.household_id,
+  );
+
+  if (countError) {
+    return err(
+      'internal_error',
+      'failed to evaluate leave policy',
+      500,
+      undefined,
+      context.operation_id,
+    );
+  }
+
+  const ownerCount = (membershipCounts ?? []).filter((row) => row.role === 'owner').length;
+  const totalCount = (membershipCounts ?? []).length;
+  const decision = decideLeavePolicy({
+    owner_count: ownerCount,
+    role: context.role,
+    total_count: totalCount,
+  });
+
+  if (decision.type === 'block') {
+    return err('sole_owner_cannot_leave', decision.message, 409, undefined, context.operation_id);
+  }
+
+  const { error: expireServeSplitError } = await service.expirePendingServeSplits(
+    context.household_id,
+    context.user_id,
+  );
+
+  if (expireServeSplitError) {
+    return err(
+      'internal_error',
+      'failed to expire open serve/splits',
+      500,
+      undefined,
+      context.operation_id,
+    );
+  }
+
+  if (decision.archive_household) {
+    const { error: archiveError } = await service.archiveHousehold(
+      context.household_id,
+      new Date().toISOString(),
+    );
+
+    if (archiveError) {
+      return err(
+        'internal_error',
+        'failed to archive household',
+        500,
+        undefined,
+        context.operation_id,
+      );
+    }
+  }
+
+  const { error: deleteError } = await service.deleteMembership(
+    context.household_id,
+    context.user_id,
+  );
+
+  if (deleteError) {
+    return err('internal_error', 'failed to leave household', 500, undefined, context.operation_id);
+  }
+
+  return ok(
+    {
+      archived: decision.archive_household,
+      household_id: context.household_id,
+    },
+    context.operation_id,
+  );
 };
 
 const toHouseholdResponse = (household: HouseholdRecord) => ({
@@ -663,84 +799,10 @@ const handleHouseholdMembers = async (request: Request): Promise<Response> =>
 const handleHouseholdLeave = async (request: Request): Promise<Response> =>
   withAuth(
     request,
-    withHousehold({ householdIdFrom: 'path' })(async (_householdRequest, context) => {
-      const service = getServiceClient();
-      const { data: membershipCounts, error: countError } = await service
-        .from('household_members')
-        .select('role')
-        .eq('household_id', context.household_id);
-
-      if (countError) {
-        return err(
-          'internal_error',
-          'failed to evaluate leave policy',
-          500,
-          undefined,
-          context.operation_id,
-        );
-      }
-
-      const ownerCount = (membershipCounts ?? []).filter((row) => row.role === 'owner').length;
-      const totalCount = (membershipCounts ?? []).length;
-      const decision = decideLeavePolicy({
-        owner_count: ownerCount,
-        role: context.role,
-        total_count: totalCount,
-      });
-
-      if (decision.type === 'block') {
-        return err(
-          'sole_owner_cannot_leave',
-          decision.message,
-          409,
-          undefined,
-          context.operation_id,
-        );
-      }
-
-      if (decision.archive_household) {
-        const { error: archiveError } = await service
-          .from('households')
-          .update({
-            archived_at: new Date().toISOString(),
-          })
-          .eq('id', context.household_id);
-
-        if (archiveError) {
-          return err(
-            'internal_error',
-            'failed to archive household',
-            500,
-            undefined,
-            context.operation_id,
-          );
-        }
-      }
-
-      const { error: deleteError } = await service
-        .from('household_members')
-        .delete()
-        .eq('household_id', context.household_id)
-        .eq('user_id', context.user_id);
-
-      if (deleteError) {
-        return err(
-          'internal_error',
-          'failed to leave household',
-          500,
-          undefined,
-          context.operation_id,
-        );
-      }
-
-      return ok(
-        {
-          archived: decision.archive_household,
-          household_id: context.household_id,
-        },
-        context.operation_id,
-      );
-    }),
+    withHousehold({ householdIdFrom: 'path' })(
+      async (_householdRequest, context) =>
+        await executeLeaveHousehold(createHouseholdLeaveService(), context),
+    ),
   );
 
 const routeHandlers: Readonly<Record<RouteKey, (request: Request) => Promise<Response>>> = {
