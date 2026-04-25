@@ -23,7 +23,7 @@ export type ResponseEnvelope<T> = {
   operation_id: string | null;
 };
 
-const CORS_ALLOW_HEADERS = 'Authorization, Idempotency-Key, Content-Type';
+const CORS_ALLOW_HEADERS = 'Authorization, Idempotency-Key, Content-Type, apikey';
 const CORS_ALLOW_METHODS = 'GET, POST, PATCH, PUT, DELETE, OPTIONS';
 
 const buildCorsHeaders = (): Headers => {

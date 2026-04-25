@@ -7,16 +7,38 @@ import migrations from '@db/migrations/migrations';
 import { households } from '@db/schema';
 
 import * as schema from './schema';
+import {
+  getLocalDatabaseUnsupportedMessage,
+  isLocalDatabaseSupported,
+  LOCAL_DATABASE_NAME,
+} from './support';
 
-const expoDatabase = openDatabaseSync('fridgr.db');
+import type { SQLiteDatabase } from 'expo-sqlite';
 
-export const db = drizzle(expoDatabase, { schema });
-
+let expoDatabase: SQLiteDatabase | null = null;
 let migrationPromise: Promise<void> | null = null;
 
+const getExpoDatabase = (): SQLiteDatabase => {
+  if (!isLocalDatabaseSupported()) {
+    throw new Error(getLocalDatabaseUnsupportedMessage());
+  }
+
+  if (expoDatabase === null) {
+    expoDatabase = openDatabaseSync(LOCAL_DATABASE_NAME);
+  }
+
+  return expoDatabase;
+};
+
+const getDb = () => drizzle(getExpoDatabase(), { schema });
+
 export const ensureDatabaseReady = async (): Promise<void> => {
+  if (!isLocalDatabaseSupported()) {
+    return;
+  }
+
   if (migrationPromise === null) {
-    migrationPromise = migrate(db, migrations);
+    migrationPromise = migrate(getDb(), migrations);
   }
 
   await migrationPromise;
@@ -31,6 +53,11 @@ export interface LocalRoundtripResult {
 export const runLocalRoundtrip = async (): Promise<LocalRoundtripResult> => {
   await ensureDatabaseReady();
 
+  if (!isLocalDatabaseSupported()) {
+    throw new Error(getLocalDatabaseUnsupportedMessage());
+  }
+
+  const db = getDb();
   const timestamp = new Date().toISOString();
   const householdId = `local-household-${timestamp}`;
   const householdName = `Debug household ${timestamp}`;

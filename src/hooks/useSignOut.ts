@@ -5,7 +5,7 @@ import { queryClient } from '@lib/queryClient';
 import { supabase } from '@lib/supabase';
 import { useSessionStore } from '@stores/useSessionStore';
 
-const LOCAL_DATABASE_NAME = 'fridgr.db';
+import { isLocalDatabaseSupported, LOCAL_DATABASE_NAME } from '@db/support';
 
 const USER_SCOPED_TABLES = [
   'ai_capture_items',
@@ -24,6 +24,10 @@ export class SignOutError extends Error {
 }
 
 const clearLocalUserScopedData = async (): Promise<void> => {
+  if (!isLocalDatabaseSupported()) {
+    return;
+  }
+
   const database = openDatabaseSync(LOCAL_DATABASE_NAME);
 
   try {
