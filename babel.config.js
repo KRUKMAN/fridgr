@@ -3,13 +3,16 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
+      ['inline-import', { extensions: ['.sql'] }],
       [
         'module-resolver',
         {
           root: ['.'],
           alias: {
-            '@': './src',
+            '@': '.',
+            '@db': './src/db',
             '@components': './src/components',
+            '@theme': './src/theme',
             '@screens': './src/screens',
             '@stores': './src/stores',
             '@models': './src/models',
@@ -22,6 +25,7 @@ module.exports = function (api) {
           },
         },
       ],
+      'react-native-reanimated/plugin',
     ],
   };
 };

@@ -19,6 +19,30 @@ AI-assisted capture, and meal tracking with partners.
 3. Copy `.env.example` to `.env.local` and fill in your values.
 4. Run `npx expo start`.
 
+## Running The Mobile App
+
+Required client env vars:
+
+- `EXPO_PUBLIC_APP_ENV`
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+The mobile app must never read `SUPABASE_SERVICE_ROLE_KEY`.
+
+Recommended local flow:
+
+1. Copy `.env.example` to `.env.local`.
+2. Fill only the `EXPO_PUBLIC_*` values needed by the app shell.
+3. Run `npm run start` for the Metro dev server.
+4. Run `npm run ios`, `npm run android`, or `npm run web` for a target.
+5. Use `npm run start:clear` if Expo Router caching gets in the way.
+
+Current route scaffold:
+
+- `app/(auth)` for unauthenticated flows
+- `app/(app)` for authenticated flows
+- root `app/_layout.tsx` for the global shell bootstrap
+
 ## Project Structure
 
 See `src/domains/` for business domain modules:

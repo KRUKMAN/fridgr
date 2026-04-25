@@ -19,7 +19,7 @@ Deno.test('ok returns the standard success envelope with JSON and CORS headers',
   assertEquals(response.headers.get('Access-Control-Allow-Origin'), '*');
   assertEquals(
     response.headers.get('Access-Control-Allow-Headers'),
-    'Authorization, Idempotency-Key, Content-Type',
+    'Authorization, Idempotency-Key, Content-Type, apikey',
   );
   assertEquals(
     response.headers.get('Access-Control-Allow-Methods'),
@@ -60,7 +60,7 @@ Deno.test('handleOptions returns a 204 preflight response with CORS headers', ()
   assertEquals(response?.headers.get('Access-Control-Allow-Origin'), '*');
   assertEquals(
     response?.headers.get('Access-Control-Allow-Headers'),
-    'Authorization, Idempotency-Key, Content-Type',
+    'Authorization, Idempotency-Key, Content-Type, apikey',
   );
   assertEquals(response?.headers.get('Content-Type'), null);
 });

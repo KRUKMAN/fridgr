@@ -66,6 +66,9 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+      - name: Verify Edge Function auth guard
+        run: npm run verify:function-auth
+
   typecheck:
     name: typecheck
     runs-on: ubuntu-latest

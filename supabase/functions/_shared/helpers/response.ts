@@ -1,9 +1,12 @@
 export type ErrorCode =
   | 'bad_request'
+  | 'already_member'
   | 'unauthorized'
   | 'forbidden'
   | 'not_found'
   | 'conflict'
+  | 'sole_owner_cannot_leave'
+  | 'validation_error'
   | 'validation_failed'
   | 'rate_limited'
   | 'internal_error';
@@ -20,7 +23,7 @@ export type ResponseEnvelope<T> = {
   operation_id: string | null;
 };
 
-const CORS_ALLOW_HEADERS = 'Authorization, Idempotency-Key, Content-Type';
+const CORS_ALLOW_HEADERS = 'Authorization, Idempotency-Key, Content-Type, apikey';
 const CORS_ALLOW_METHODS = 'GET, POST, PATCH, PUT, DELETE, OPTIONS';
 
 const buildCorsHeaders = (): Headers => {
@@ -48,11 +51,7 @@ const jsonResponse = <T>(envelope: ResponseEnvelope<T>, status: number): Respons
     headers: buildJsonHeaders(),
   });
 
-export const ok = <T>(
-  data: T,
-  operationId?: string,
-  status = 200,
-): Response =>
+export const ok = <T>(data: T, operationId?: string, status = 200): Response =>
   jsonResponse(
     {
       data,

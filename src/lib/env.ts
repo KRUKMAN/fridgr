@@ -1,39 +1,57 @@
+import Constants from 'expo-constants';
+
 export type AppEnvironment = 'development' | 'staging' | 'production';
 
-type ExpoPublicEnvKey =
-  | 'EXPO_PUBLIC_APP_ENV'
-  | 'EXPO_PUBLIC_SUPABASE_URL'
-  | 'EXPO_PUBLIC_SUPABASE_ANON_KEY';
+interface PublicEnvConfig {
+  appEnv?: string;
+  supabaseAnonKey?: string;
+  supabaseUrl?: string;
+}
+
+interface AppConfigExtra {
+  appEnv?: string;
+  publicEnv?: PublicEnvConfig;
+}
 
 const DEFAULT_APP_ENVIRONMENT: AppEnvironment = 'development';
 
 const isAppEnvironment = (value: string): value is AppEnvironment =>
   value === 'development' || value === 'staging' || value === 'production';
 
-const getRequiredExpoPublicEnv = (key: ExpoPublicEnvKey): string => {
-  const value = process.env[key];
+const getAppExtra = (): AppConfigExtra => {
+  const extra = Constants.expoConfig?.extra;
+  return typeof extra === 'object' && extra !== null ? (extra as AppConfigExtra) : {};
+};
+
+const getRequiredConfigValue = (
+  config: PublicEnvConfig,
+  key: keyof PublicEnvConfig,
+  fallbackKey: string,
+): string => {
+  const value = config[key] ?? process.env[fallbackKey];
 
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new Error(`Missing required Expo environment variable: ${key}`);
+    throw new Error(`Missing required Expo configuration value: ${fallbackKey}`);
   }
 
   return value;
 };
 
-const getAppEnvironment = (): AppEnvironment => {
-  const value = process.env.EXPO_PUBLIC_APP_ENV;
+const extra = getAppExtra();
+const publicEnv = extra.publicEnv ?? {};
+const rawAppEnvironment = publicEnv.appEnv ?? extra.appEnv ?? process.env.EXPO_PUBLIC_APP_ENV;
 
-  if (typeof value !== 'string' || value.trim().length === 0) {
-    return DEFAULT_APP_ENVIRONMENT;
-  }
-
-  return isAppEnvironment(value) ? value : DEFAULT_APP_ENVIRONMENT;
-};
-
-export const appEnvironment = getAppEnvironment();
+export const appEnvironment: AppEnvironment =
+  typeof rawAppEnvironment === 'string' && isAppEnvironment(rawAppEnvironment)
+    ? rawAppEnvironment
+    : DEFAULT_APP_ENVIRONMENT;
 
 export const appConfig = Object.freeze({
   appEnvironment,
-  supabaseAnonKey: getRequiredExpoPublicEnv('EXPO_PUBLIC_SUPABASE_ANON_KEY'),
-  supabaseUrl: getRequiredExpoPublicEnv('EXPO_PUBLIC_SUPABASE_URL'),
+  supabaseAnonKey: getRequiredConfigValue(
+    publicEnv,
+    'supabaseAnonKey',
+    'EXPO_PUBLIC_SUPABASE_ANON_KEY',
+  ),
+  supabaseUrl: getRequiredConfigValue(publicEnv, 'supabaseUrl', 'EXPO_PUBLIC_SUPABASE_URL'),
 });
