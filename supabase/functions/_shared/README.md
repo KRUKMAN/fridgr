@@ -44,6 +44,10 @@ Use the same pattern for every new endpoint:
 - Use the user-scoped client for authorization-sensitive reads.
 - Echo the `operation_id` from the idempotency header in every response.
 - Keep schemas strict. Extra fields should fail validation.
+- While Supabase projects use asymmetric `ES256` user tokens, Edge
+  Functions stay deployed with `--no-verify-jwt` and must enforce auth
+  inside the handler with `withAuth`. CI verifies this for every
+  non-public function entrypoint.
 
 ## Status
 

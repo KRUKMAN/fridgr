@@ -7,8 +7,13 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./*"],
+      "@db": ["src/db"],
+      "@db/*": ["src/db/*"],
+      "@components": ["src/components"],
       "@components/*": ["src/components/*"],
+      "@theme": ["src/theme"],
+      "@theme/*": ["src/theme/*"],
       "@screens/*": ["src/screens/*"],
       "@stores/*": ["src/stores/*"],
       "@models/*": ["src/models/*"],
@@ -20,7 +25,7 @@
       "@domains/*": ["src/domains/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["expo-env.d.ts", "**/*.ts", "**/*.tsx", ".expo/types/**/*.ts"],
   "exclude": [
     "node_modules",
     "supabase/functions/**",
