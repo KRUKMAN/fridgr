@@ -24,17 +24,19 @@ export const spacing = {
 
 export const radii = {
   none: 0,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 20,
+  sm: 8,
+  md: 12,
+  lg: 18,
+  xl: 26,
+  xxl: 36,
+  xxxl: 44,
   full: 9999,
 } as const;
 
 export const typography = {
-  display: { fontSize: 32, fontWeight: '700', lineHeight: 40 },
-  title: { fontSize: 24, fontWeight: '600', lineHeight: 32 },
-  heading: { fontSize: 18, fontWeight: '600', lineHeight: 24 },
+  display: { fontSize: 34, fontWeight: '800', lineHeight: 42 },
+  title: { fontSize: 25, fontWeight: '700', lineHeight: 33 },
+  heading: { fontSize: 18, fontWeight: '700', lineHeight: 24 },
   body: { fontSize: 16, fontWeight: '400', lineHeight: 24 },
   bodyStrong: { fontSize: 16, fontWeight: '600', lineHeight: 24 },
   caption: { fontSize: 13, fontWeight: '400', lineHeight: 18 },
@@ -47,6 +49,7 @@ export const borderWidths = {
   hairline: StyleSheet.hairlineWidth,
   thin: 1,
   thick: 2,
+  chunky: 3,
 } as const;
 
 export const iconSizes = {
@@ -101,15 +104,21 @@ export const shadows = {
     shadowRadius: 0,
   },
   card: {
-    elevation: 3,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
+    elevation: 2,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
   },
   sheet: {
     elevation: 8,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.16,
+    shadowRadius: 32,
+  },
+  glow: {
+    elevation: 6,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.24,
+    shadowRadius: 22,
   },
 } as const satisfies Record<string, ShadowToken>;

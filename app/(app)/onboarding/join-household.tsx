@@ -94,6 +94,7 @@ export default function JoinHouseholdScreen(): JSX.Element {
       >
         <Card
           padding="lg"
+          variant="hero"
           style={{
             gap: theme.spacing.lg,
             maxWidth: 440,
@@ -113,7 +114,7 @@ export default function JoinHouseholdScreen(): JSX.Element {
                 textTransform: 'uppercase',
               }}
             >
-              Household setup
+              Household fridge
             </Text>
             <Text
               allowFontScaling

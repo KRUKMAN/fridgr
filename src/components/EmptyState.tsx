@@ -28,10 +28,10 @@ export function EmptyState({
     <View
       style={{
         alignItems: 'center',
-        backgroundColor: theme.colors.surfaceElevated,
+        backgroundColor: theme.colors.surfaceMuted,
         borderColor: theme.colors.border,
-        borderRadius: theme.radii.xl,
-        borderWidth: theme.borderWidths.thin,
+        borderRadius: theme.radii.xxl,
+        borderWidth: theme.borderWidths.thick,
         gap: theme.spacing.md,
         padding: theme.spacing.xl,
       }}

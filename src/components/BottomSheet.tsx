@@ -66,7 +66,9 @@ export function BottomSheet({
       backgroundStyle={{
         backgroundColor: theme.colors.surfaceElevated,
         borderColor: theme.colors.border,
-        borderWidth: theme.borderWidths.thin,
+        borderTopLeftRadius: theme.radii.xxxl,
+        borderTopRightRadius: theme.radii.xxxl,
+        borderWidth: theme.borderWidths.thick,
       }}
       handleIndicatorStyle={{
         backgroundColor: theme.colors.borderStrong,

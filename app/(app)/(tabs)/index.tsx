@@ -32,7 +32,7 @@ export function TabPlaceholder({
         padding: theme.spacing.xl,
       }}
     >
-      <Card padding="lg">
+      <Card padding="lg" variant="hero">
         <View style={{ gap: theme.spacing.sm }}>
           <Text
             allowFontScaling

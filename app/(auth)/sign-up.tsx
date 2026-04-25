@@ -121,6 +121,7 @@ export default function SignUpScreen(): JSX.Element {
         >
           <Card
             padding="lg"
+            variant="hero"
             style={{
               gap: theme.spacing.lg,
               maxWidth: 440,
@@ -213,6 +214,7 @@ export default function SignUpScreen(): JSX.Element {
       >
         <Card
           padding="lg"
+          variant="hero"
           style={{
             gap: theme.spacing.lg,
             maxWidth: 440,
@@ -232,7 +234,7 @@ export default function SignUpScreen(): JSX.Element {
                 textTransform: 'uppercase',
               }}
             >
-              Fridgr
+              Start your soft kitchen
             </Text>
             <Text
               allowFontScaling
@@ -256,7 +258,7 @@ export default function SignUpScreen(): JSX.Element {
                 textAlign: 'center',
               }}
             >
-              Set up your Fridgr profile so you can create or join a household next.
+              Create your profile, then we will get you into a household before the app opens.
             </Text>
           </View>
 

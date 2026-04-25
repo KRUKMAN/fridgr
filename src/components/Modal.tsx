@@ -85,8 +85,8 @@ export function Modal({
           style={{
             backgroundColor: theme.colors.surfaceElevated,
             borderColor: theme.colors.border,
-            borderRadius: theme.radii.xl,
-            borderWidth: theme.borderWidths.thin,
+            borderRadius: theme.radii.xxl,
+            borderWidth: theme.borderWidths.thick,
             maxWidth: theme.componentSizes.modal.maxWidth,
             padding: theme.spacing.lg,
             shadowColor: theme.colors.shadow,

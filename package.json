@@ -15,6 +15,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "husky",
     "verify:function-auth": "node scripts/verifyEdgeAuthImports.cjs",
+    "smoke:wave3": "node scripts/wave3Smoke.cjs",
     "test": "node --test test/ciSmoke.test.js && deno test --config supabase/functions/deno.json supabase/functions/_shared supabase/functions/households"
   },
   "dependencies": {
