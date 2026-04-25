@@ -7,6 +7,7 @@ export {
 } from './BottomSheet';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button';
 export { Card, type CardProps } from './Card';
+export { Chip, type ChipProps, type ChipVariant } from './Chip';
 export { Divider, type DividerProps } from './Divider';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { Header, type HeaderProps } from './Header';

@@ -270,7 +270,7 @@ export default function SettingsTab(): JSX.Element {
       >
         <Header
           subtitle="Manage your household, account, and safety actions from one place."
-          title="Settings"
+          title="You"
         />
 
         {canSwitchHouseholds ? (
