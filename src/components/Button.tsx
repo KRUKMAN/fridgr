@@ -52,12 +52,13 @@ export function Button({
         alignItems: 'center',
         backgroundColor: palette.backgroundColor,
         borderColor: palette.borderColor,
-        borderRadius: theme.radii.lg,
+        borderRadius: theme.radii.full,
         borderWidth: palette.borderWidth,
         justifyContent: 'center',
         minHeight: height,
         opacity: pressed ? theme.opacities.pressed : 1,
         paddingHorizontal: theme.spacing.lg,
+        transform: [{ scale: pressed ? 0.97 : 1 }],
         width: fullWidth ? '100%' : undefined,
       })}
       testID={testID}
@@ -111,23 +112,23 @@ function getButtonPalette(
     case 'secondary':
       return {
         backgroundColor: theme.colors.surfaceElevated,
-        borderColor: theme.colors.border,
-        borderWidth: theme.borderWidths.thin,
-        foregroundColor: theme.colors.text,
+        borderColor: theme.colors.primary,
+        borderWidth: theme.borderWidths.thick,
+        foregroundColor: theme.colors.primary,
       };
     case 'destructive':
       return {
-        backgroundColor: theme.colors.destructive,
+        backgroundColor: theme.colors.destructiveSoft,
         borderColor: theme.colors.destructive,
-        borderWidth: theme.borderWidths.none,
-        foregroundColor: theme.colors.destructiveForeground,
+        borderWidth: theme.borderWidths.thick,
+        foregroundColor: theme.colors.destructive,
       };
     case 'ghost':
       return {
-        backgroundColor: theme.colors.overlay,
-        borderColor: theme.colors.overlay,
+        backgroundColor: theme.colors.surfaceMuted,
+        borderColor: theme.colors.surfaceMuted,
         borderWidth: theme.borderWidths.none,
-        foregroundColor: theme.colors.text,
+        foregroundColor: theme.colors.textMuted,
       };
     case 'primary':
     default:

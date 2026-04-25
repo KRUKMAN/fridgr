@@ -88,6 +88,7 @@ export default function SignInScreen(): JSX.Element {
       >
         <Card
           padding="lg"
+          variant="hero"
           style={{
             gap: theme.spacing.lg,
             maxWidth: 440,
@@ -107,7 +108,7 @@ export default function SignInScreen(): JSX.Element {
                 textTransform: 'uppercase',
               }}
             >
-              Fridgr
+              Your soft kitchen ledger
             </Text>
             <Text
               allowFontScaling
@@ -131,7 +132,7 @@ export default function SignInScreen(): JSX.Element {
                 textAlign: 'center',
               }}
             >
-              Sign in to pick up where your household left off.
+              Sign in to pick up where your fridge, diary, and household left off.
             </Text>
           </View>
 
