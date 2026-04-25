@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 
-import { Link } from 'expo-router';
+import { Link, useRouter, type Href } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { mapAuthError } from '@lib/authErrors';
 import { supabase } from '@lib/supabase';
+import { useSessionStore } from '@stores/useSessionStore';
 
 import { Button, Card, Input, useToast } from '@components';
 import { useTheme } from '@theme';
@@ -14,7 +15,9 @@ import type { JSX } from 'react';
 
 export default function SignInScreen(): JSX.Element {
   const theme = useTheme();
+  const router = useRouter();
   const { showToast } = useToast();
+  const setAuthenticated = useSessionStore((state) => state.setAuthenticated);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState<string | undefined>(undefined);
@@ -53,7 +56,7 @@ export default function SignInScreen(): JSX.Element {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password,
       });
@@ -63,7 +66,16 @@ export default function SignInScreen(): JSX.Element {
         setEmailError(details.email);
         setPasswordError(details.password);
         setFormError(details.general);
+        return;
       }
+
+      if (!data.session) {
+        setFormError('We could not start a session. Please try again.');
+        return;
+      }
+
+      setAuthenticated(data.session);
+      router.replace('/(app)/(tabs)' as Href);
     } catch (error) {
       setFormError(mapAuthError(error).general);
     } finally {
