@@ -1,6 +1,10 @@
 import { openDatabaseSync } from 'expo-sqlite';
 
-const LOCAL_DATABASE_NAME = 'fridgr.db';
+import {
+  getLocalDatabaseUnsupportedMessage,
+  isLocalDatabaseSupported,
+  LOCAL_DATABASE_NAME,
+} from '@db/support';
 
 const escapeSqlString = (value: string): string => value.replaceAll("'", "''");
 
@@ -8,6 +12,10 @@ export const clearHouseholdScopedData = async (householdId: string): Promise<voi
   const trimmedHouseholdId = householdId.trim();
 
   if (!trimmedHouseholdId) {
+    return;
+  }
+
+  if (!isLocalDatabaseSupported()) {
     return;
   }
 
@@ -50,7 +58,7 @@ export const clearHouseholdScopedData = async (householdId: string): Promise<voi
   } catch (error) {
     await database.execAsync('ROLLBACK;').catch(() => undefined);
     await database.execAsync('PRAGMA foreign_keys = ON;').catch(() => undefined);
-    throw error;
+    throw error instanceof Error ? error : new Error(getLocalDatabaseUnsupportedMessage());
   } finally {
     await database.closeAsync().catch(() => undefined);
   }
