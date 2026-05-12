@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { getExpiryIndicatorState } from './expiryIndicator.ts';
+import { getExpiryIndicatorState } from './expiryIndicator';
 
 const noon = new Date(2026, 4, 12, 12);
 
