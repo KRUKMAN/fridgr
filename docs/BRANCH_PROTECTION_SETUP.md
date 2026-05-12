@@ -8,19 +8,17 @@ This runbook configures and validates branch protection for `main` and `develop`
 2. Local repository has an `origin` remote.
 3. You are authenticated to GitHub (Web UI or GitHub CLI).
 
-## 1. Connect Remote (if needed)
+## 1. Connect remote (if needed)
 
-```powershell
+```bash
 git remote add origin https://github.com/<OWNER>/<REPO>.git
 git push -u origin main
 git push -u origin develop
 ```
 
-## 2. Apply Protection Rules in GitHub UI
+## 2. Apply protection rules in GitHub UI
 
-Open:
-
-- Repository -> Settings -> Rules -> Rulesets -> New ruleset (Branch)
+Open: **Repository → Settings → Rules → Rulesets → New ruleset (Branch)**
 
 Create two rulesets:
 
@@ -42,43 +40,41 @@ Additional for `main` only:
 
 - Require linear history
 
-## 3. Optional CLI Apply (if `gh` is available)
+## 3. Optional CLI apply (if `gh` is available)
 
 Use the repository rules payload from `github-branch-protection.json`.
 
-```powershell
+```bash
 gh api repos/<OWNER>/<REPO>/rulesets --method GET
 ```
 
 If no matching rulesets exist, create them with the GitHub API from the JSON file.
 
-## 4. Validation Steps
+## 4. Validation steps
 
 1. Create a test branch:
 
-```powershell
+```bash
 git checkout develop
 git checkout -b feature/W0-branch-protection-test
 ```
 
 2. Make a tiny docs change and push:
 
-```powershell
-git add README.md CONTRIBUTING.md BRANCH_PROTECTION_SETUP.md .github/workflows/ci.yml
+```bash
+git add README.md CONTRIBUTING.md .github/workflows/ci.yml
 git commit -m "docs(branching): add branch protection runbook and CI gate"
 git push -u origin feature/W0-branch-protection-test
 ```
 
 3. Open PR to `develop`.
 4. Confirm:
-
-- merge blocked before approval
-- merge blocked before `lint-and-typecheck` succeeds
+   - Merge blocked before approval
+   - Merge blocked before `lint-and-typecheck` succeeds
 
 5. Direct push block test:
 
-```powershell
-git checkout main
+```bash
 echo "branch-protection-test" >> protection-test.txt
 git add protection-test.txt
 git commit -m "test: verify direct push is blocked"
@@ -87,8 +83,6 @@ git push origin main
 
 Expected: push rejected due to branch protection.
 
-## 5. Evidence Recording
+## 5. Evidence recording
 
-Record the test PR URL in:
-
-- `README.md` -> "Branch Protection Validation Evidence"
+Record the test PR URL in `CONTRIBUTING.md` under "Branch Protection Status".

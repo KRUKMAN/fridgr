@@ -51,5 +51,8 @@ Use the same pattern for every new endpoint:
 
 ## Status
 
-Wave 1 creates the scaffold and shared middleware/helpers.
-Wave 2 will add real endpoint behavior on top of this foundation.
+Wave 1 delivered this scaffold and shared middleware/helpers.
+Wave 3 (active) builds real endpoint behaviour — `diary`, `fridge-items`,
+`food-catalog` — on top of it. See
+[`docs/WAVE3_DIARY_BACKEND.md`](../../../docs/WAVE3_DIARY_BACKEND.md) for the
+diary backend design decisions.

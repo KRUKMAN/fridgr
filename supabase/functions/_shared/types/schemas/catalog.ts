@@ -2,6 +2,8 @@ import { z } from 'npm:zod@3.25.76';
 
 import { UuidV4 } from '../../helpers/validate.ts';
 
+const ServingBaseUnit = z.enum(['g', 'ml', 'count']);
+
 const NutritionFieldsSchema = z
   .object({
     carbs_mg: z.number().int().nonnegative().optional(),
@@ -25,10 +27,15 @@ export const searchFoodsSchema = z
 
 export const createPersonalFoodSchema = z
   .object({
+    brand: z.string().trim().min(1).optional(),
     category: z.string().trim().min(1).optional(),
+    carbs_mg_per_base: z.number().int().nonnegative(),
+    fat_mg_per_base: z.number().int().nonnegative(),
+    kcal_per_base: z.number().nonnegative(),
     linked_global_id: UuidV4.optional(),
     name: z.string().trim().min(1),
-    nutrition: NutritionFieldsSchema.optional(),
+    protein_mg_per_base: z.number().int().nonnegative(),
+    serving_base_unit: ServingBaseUnit,
   })
   .strict();
 
