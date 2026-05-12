@@ -178,14 +178,11 @@ export default function CreateHouseholdScreen(): JSX.Element {
               </Text>
             </View>
 
-            <View
+            <Card
+              padding="lg"
+              variant="soft"
               style={{
-                backgroundColor: theme.colors.primarySoft,
-                borderColor: theme.colors.primary,
-                borderRadius: theme.radii.xl,
-                borderWidth: theme.borderWidths.thin,
                 gap: theme.spacing.sm,
-                padding: theme.spacing.lg,
               }}
             >
               <Text
@@ -214,7 +211,7 @@ export default function CreateHouseholdScreen(): JSX.Element {
               >
                 {createdHousehold.invite_code ?? 'Unavailable'}
               </Text>
-            </View>
+            </Card>
 
             <View style={{ gap: theme.spacing.md }}>
               {canCopyInviteCode && createdHousehold.invite_code ? (
