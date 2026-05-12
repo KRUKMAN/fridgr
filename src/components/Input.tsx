@@ -49,11 +49,11 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
           alignItems: 'center',
           backgroundColor: theme.colors.inputBackground,
           borderColor: hasError ? theme.colors.destructive : theme.colors.border,
-          borderRadius: theme.radii.lg,
-          borderWidth: theme.borderWidths.thin,
+          borderRadius: theme.radii.xl,
+          borderWidth: hasError ? theme.borderWidths.thick : theme.borderWidths.thin,
           flexDirection: 'row',
           minHeight: theme.componentSizes.input.minHeight,
-          paddingHorizontal: theme.spacing.md,
+          paddingHorizontal: theme.spacing.lg,
         }}
       >
         <TextInput

@@ -118,8 +118,8 @@ function ToastViewport({ payload, translateY }: ToastViewportProps): JSX.Element
         style={{
           backgroundColor: palette.backgroundColor,
           borderColor: palette.borderColor,
-          borderRadius: theme.radii.xl,
-          borderWidth: theme.borderWidths.thin,
+          borderRadius: theme.radii.xxl,
+          borderWidth: theme.borderWidths.thick,
           paddingHorizontal: theme.spacing.lg,
           paddingVertical: theme.spacing.md,
           shadowColor: theme.colors.shadow,

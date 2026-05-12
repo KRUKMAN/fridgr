@@ -29,38 +29,68 @@ export default function TabsLayout(): React.JSX.Element | null {
         headerShown: false,
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.textMuted,
-        tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopColor: theme.colors.border,
+        tabBarLabelStyle: {
+          fontSize: theme.typography.micro.fontSize,
+          fontWeight: theme.typography.micro.fontWeight,
         },
-        tabBarIcon: ({ color, size }) => (
-          <Ionicons color={color} name={getTabIcon(route.name)} size={size} />
+        tabBarStyle: {
+          backgroundColor: theme.colors.surfaceElevated,
+          borderColor: theme.colors.border,
+          borderRadius: theme.radii.xxxl,
+          borderTopColor: theme.colors.border,
+          borderWidth: theme.borderWidths.thick,
+          height: 76,
+          marginBottom: theme.spacing.md,
+          marginHorizontal: theme.spacing.lg,
+          paddingBottom: theme.spacing.sm,
+          paddingTop: theme.spacing.sm,
+          position: 'absolute',
+          shadowColor: theme.colors.shadow,
+          ...theme.shadows.sheet,
+        },
+        tabBarIcon: ({ color, focused, size }) => (
+          <Ionicons
+            color={route.name === 'cook' ? theme.colors.electricPink : color}
+            name={getTabIcon(route.name, focused)}
+            size={route.name === 'cook' ? size + 14 : size}
+          />
         ),
       })}
     >
       <Tabs.Screen name="index" options={{ title: 'Dashboard' }} />
       <Tabs.Screen name="fridge" options={{ title: 'Fridge' }} />
+      <Tabs.Screen name="cook" options={{ title: 'AI' }} />
       <Tabs.Screen name="diary" options={{ title: 'Diary' }} />
-      <Tabs.Screen name="cook" options={{ title: 'Cook' }} />
-      <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
+      <Tabs.Screen name="settings" options={{ title: 'You' }} />
     </Tabs>
   );
 }
 
 function getTabIcon(
   routeName: string,
-): 'book-outline' | 'home-outline' | 'restaurant-outline' | 'settings-outline' | 'snow-outline' {
+  focused: boolean,
+):
+  | 'book'
+  | 'book-outline'
+  | 'home'
+  | 'home-outline'
+  | 'mic-circle'
+  | 'mic-circle-outline'
+  | 'person'
+  | 'person-outline'
+  | 'snow'
+  | 'snow-outline' {
   switch (routeName) {
     case 'fridge':
-      return 'snow-outline';
+      return focused ? 'snow' : 'snow-outline';
     case 'diary':
-      return 'book-outline';
+      return focused ? 'book' : 'book-outline';
     case 'cook':
-      return 'restaurant-outline';
+      return focused ? 'mic-circle' : 'mic-circle-outline';
     case 'settings':
-      return 'settings-outline';
+      return focused ? 'person' : 'person-outline';
     case 'index':
     default:
-      return 'home-outline';
+      return focused ? 'home' : 'home-outline';
   }
 }

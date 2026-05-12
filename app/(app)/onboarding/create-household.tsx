@@ -130,6 +130,7 @@ export default function CreateHouseholdScreen(): JSX.Element {
         >
           <Card
             padding="lg"
+            variant="hero"
             style={{
               gap: theme.spacing.lg,
               maxWidth: 440,
@@ -248,6 +249,7 @@ export default function CreateHouseholdScreen(): JSX.Element {
       >
         <Card
           padding="lg"
+          variant="hero"
           style={{
             gap: theme.spacing.lg,
             maxWidth: 440,
@@ -267,7 +269,7 @@ export default function CreateHouseholdScreen(): JSX.Element {
                 textTransform: 'uppercase',
               }}
             >
-              Household setup
+              Household fridge
             </Text>
             <Text
               allowFontScaling
@@ -291,7 +293,7 @@ export default function CreateHouseholdScreen(): JSX.Element {
                 textAlign: 'center',
               }}
             >
-              Start with a name. Fridgr will generate an invite code you can share right away.
+              Start with a name. Fridgr will make an invite code once your household is created.
             </Text>
           </View>
 

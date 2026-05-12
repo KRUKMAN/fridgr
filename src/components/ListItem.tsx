@@ -37,13 +37,14 @@ export function ListItem({
         alignItems: 'center',
         backgroundColor: theme.colors.surfaceElevated,
         borderColor: theme.colors.border,
-        borderRadius: theme.radii.lg,
+        borderRadius: theme.radii.xl,
         borderWidth: theme.borderWidths.thin,
         flexDirection: 'row',
         gap: theme.spacing.md,
         opacity: pressed ? theme.opacities.pressed : 1,
         paddingHorizontal: theme.spacing.md,
         paddingVertical: theme.spacing.md,
+        transform: [{ scale: pressed ? 0.985 : 1 }],
       })}
     >
       {left ? <View>{left}</View> : null}

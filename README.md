@@ -113,14 +113,7 @@ To debug failures, inspect the Actions tab:
 Branching and merge rules are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
 Coding and workflow docs are documented in:
 
-- [CONVENTIONS.md](CONVENTIONS.md)
-- [docs/COMMIT_FORMAT.md](docs/COMMIT_FORMAT.md)
-- [docs/TICKET_TO_CODE_GUIDE.md](docs/TICKET_TO_CODE_GUIDE.md)
-
-## Branch Protection Validation Evidence
-
-After creating a test PR that validates protection behavior, add the PR
-link here.
-
-- Test PR: `<add-link-here>`
-- Test PR: `https://github.com/KRUKMAN/fridgr/pull/1`
+- [CLAUDE.md](CLAUDE.md) — primary agent guide (architecture, constraints, security rules)
+- [CONVENTIONS.md](CONVENTIONS.md) — naming and file conventions
+- [docs/COMMIT_FORMAT.md](docs/COMMIT_FORMAT.md) — commit message format
+- [docs/TICKET_TO_CODE_GUIDE.md](docs/TICKET_TO_CODE_GUIDE.md) — ticket-to-code workflow
