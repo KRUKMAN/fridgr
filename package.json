@@ -16,7 +16,7 @@
     "prepare": "husky",
     "verify:function-auth": "node scripts/verifyEdgeAuthImports.cjs",
     "smoke:wave3": "node scripts/wave3Smoke.cjs",
-    "test": "node --test test/ciSmoke.test.js && deno test --config supabase/functions/deno.json supabase/functions/_shared supabase/functions/households supabase/functions/diary"
+    "test": "node --test test/ciSmoke.test.js src/lib/expiryIndicator.test.ts && deno test --config supabase/functions/deno.json supabase/functions/_shared supabase/functions/households supabase/functions/diary"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
