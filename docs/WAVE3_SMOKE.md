@@ -11,9 +11,14 @@ It covers:
 Planned additions once the Wave 3 endpoints are implemented:
 
 - Member happy-path create/search/list flows for food catalog, fridge, and diary.
-- D-5 event checks for `FridgeItemAdded`, `FridgeItemConsumed`, `FridgeItemWasted`, `DiaryEntryCreated`, and `DiaryEntryCorrected`.
+- D-5 event checks for `FridgeItemAdded`, `FridgeItemConsumed`,
+  `FridgeItemWasted`, `DiaryEntryCreated`, and `DiaryEntryCorrected`.
 - Consume-with-diary atomicity proof.
 - Diary correction append-only proof that the original row is unchanged.
+
+Diary backend implementation notes live in
+[WAVE3_DIARY_BACKEND.md](WAVE3_DIARY_BACKEND.md). Diary mutations should remain
+transactional RPC-backed writes, not sequential Edge Function writes.
 
 Run with:
 
