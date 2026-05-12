@@ -1,7 +1,7 @@
 # Fridgr Conventions
 
 This document is the naming and code convention reference for the repo.
-Use it together with [AGENTS.md](AGENTS.md),
+Use it together with [CLAUDE.md](CLAUDE.md),
 [docs/COMMIT_FORMAT.md](docs/COMMIT_FORMAT.md), and
 [docs/TICKET_TO_CODE_GUIDE.md](docs/TICKET_TO_CODE_GUIDE.md).
 
