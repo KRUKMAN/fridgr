@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "allow": ["Read(//c/Users/jakub/.claude/**)", "mcp__claude_ai_Notion__notion-search"]
+  }
+}

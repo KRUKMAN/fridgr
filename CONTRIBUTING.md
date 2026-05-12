@@ -29,6 +29,8 @@ Branch rules:
 
 ## 2. AI Agent Workflow
 
+- Read [CLAUDE.md](CLAUDE.md) before starting any task — it contains
+  architecture rules, security constraints, and escalation criteria.
 - One coding agent works on exactly one `feature/*` branch per ticket.
 - No coding agent pushes directly to `main` or `develop`.
 - Parallel agents are allowed only when tickets do not compete on the
@@ -82,7 +84,8 @@ Branch protection must be applied to both `main` and `develop`:
 - `develop`: linear history not required
 
 If GitHub CLI authentication is unavailable, apply rules manually using
-`github-branch-protection.json`.
+`github-branch-protection.json`. Full setup runbook:
+[docs/BRANCH_PROTECTION_SETUP.md](docs/BRANCH_PROTECTION_SETUP.md).
 
 ## 6. Branch Protection Verification
 
@@ -102,6 +105,3 @@ Use this checklist every time repository protection is set up or changed:
    `feature/W0-branch-protection-test` targeting `develop`, and verify
    merge is blocked until `lint-and-typecheck` succeeds and at least
    1 approval is submitted.
-
-Record the validation PR link in this file or in `README.md` under
-"Branch protection validation evidence".
