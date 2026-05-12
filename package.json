@@ -16,7 +16,7 @@
     "prepare": "husky",
     "verify:function-auth": "node scripts/verifyEdgeAuthImports.cjs",
     "smoke:wave3": "node scripts/wave3Smoke.cjs",
-    "test": "node --test test/ciSmoke.test.js && deno test --config supabase/functions/deno.json supabase/functions/_shared supabase/functions/households"
+    "test": "node --test test/ciSmoke.test.js && deno test --config supabase/functions/deno.json supabase/functions/_shared supabase/functions/households supabase/functions/diary"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -64,6 +64,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
+    "supabase": "^2.98.2",
     "typescript": "~5.9.2"
   },
   "private": true,
