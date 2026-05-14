@@ -1,5 +1,33 @@
 {
   "permissions": {
-    "allow": ["Read(//c/Users/jakub/.claude/**)", "mcp__claude_ai_Notion__notion-search"]
+    "allow": [
+      "Read(//c/Users/jakub/.claude/**)",
+      "mcp__claude_ai_Notion__notion-search",
+      "mcp__claude_ai_Notion__notion-fetch",
+      "Bash(git push *)",
+      "Bash(gh pr *)",
+      "Bash(gh api *)",
+      "Bash(git checkout *)",
+      "Bash(git merge *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git status*)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(npm run *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(mkdir *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(sed *)",
+      "Bash(grep *)",
+      "Write(**)",
+      "Edit(**)",
+      "Bash(git check-ignore *)"
+    ]
   }
 }
