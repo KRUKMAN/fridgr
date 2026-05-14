@@ -11,6 +11,7 @@ import { Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { isSupabaseConfigured, missingPublicConfig } from '@lib/env';
 import { queryClient } from '@lib/queryClient';
 import { supabase } from '@lib/supabase';
 import { useSessionStore } from '@stores/useSessionStore';
@@ -50,6 +51,11 @@ function AppBootstrap(): JSX.Element {
   const setUnauthenticated = useSessionStore((state) => state.setUnauthenticated);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      void SplashScreen.hideAsync().catch(() => undefined);
+      return;
+    }
+
     let isMounted = true;
 
     const bootstrap = async (): Promise<void> => {
@@ -114,6 +120,16 @@ function AppBootstrap(): JSX.Element {
   if (databaseError) {
     return (
       <BootstrapMessage message={databaseError} title="Database bootstrap failed" variant="error" />
+    );
+  }
+
+  if (!isSupabaseConfigured) {
+    return (
+      <BootstrapMessage
+        message={`Set ${missingPublicConfig.join(' and ')} before signing in.`}
+        title="Configuration required"
+        variant="error"
+      />
     );
   }
 

@@ -23,15 +23,15 @@ const getAppExtra = (): AppConfigExtra => {
   return typeof extra === 'object' && extra !== null ? (extra as AppConfigExtra) : {};
 };
 
-const getRequiredConfigValue = (
+const getConfigValue = (
   config: PublicEnvConfig,
   key: keyof PublicEnvConfig,
   fallbackKey: string,
-): string => {
+): string | null => {
   const value = config[key] ?? process.env[fallbackKey];
 
   if (typeof value !== 'string' || value.trim().length === 0) {
-    throw new Error(`Missing required Expo configuration value: ${fallbackKey}`);
+    return null;
   }
 
   return value;
@@ -46,12 +46,22 @@ export const appEnvironment: AppEnvironment =
     ? rawAppEnvironment
     : DEFAULT_APP_ENVIRONMENT;
 
+const supabaseAnonKey = getConfigValue(
+  publicEnv,
+  'supabaseAnonKey',
+  'EXPO_PUBLIC_SUPABASE_ANON_KEY',
+);
+const supabaseUrl = getConfigValue(publicEnv, 'supabaseUrl', 'EXPO_PUBLIC_SUPABASE_URL');
+
+export const missingPublicConfig = [
+  ...(supabaseUrl ? [] : ['EXPO_PUBLIC_SUPABASE_URL']),
+  ...(supabaseAnonKey ? [] : ['EXPO_PUBLIC_SUPABASE_ANON_KEY']),
+] as const;
+
+export const isSupabaseConfigured = missingPublicConfig.length === 0;
+
 export const appConfig = Object.freeze({
   appEnvironment,
-  supabaseAnonKey: getRequiredConfigValue(
-    publicEnv,
-    'supabaseAnonKey',
-    'EXPO_PUBLIC_SUPABASE_ANON_KEY',
-  ),
-  supabaseUrl: getRequiredConfigValue(publicEnv, 'supabaseUrl', 'EXPO_PUBLIC_SUPABASE_URL'),
+  supabaseAnonKey: supabaseAnonKey ?? 'missing-preview-anon-key',
+  supabaseUrl: supabaseUrl ?? 'https://example.supabase.co',
 });
