@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import { Text, TextInput, View, type TextInputProps } from 'react-native';
 
 import { useTheme } from '../theme';
@@ -16,12 +16,43 @@ export type InputProps = Readonly<{
   TextInputProps;
 
 export const Input = forwardRef<TextInput, InputProps>(function Input(
-  { accessibilityLabel, errorText, helperText, label, rightAdornment, style, ...props },
+  {
+    accessibilityLabel,
+    errorText,
+    helperText,
+    label,
+    onBlur,
+    onFocus,
+    rightAdornment,
+    style,
+    ...props
+  },
   ref,
 ): JSX.Element {
   const theme = useTheme();
+  const [isFocused, setIsFocused] = useState(false);
   const hasError = Boolean(errorText);
   const hint = errorText ?? helperText;
+
+  const borderColor = hasError
+    ? theme.colors.destructive
+    : isFocused
+      ? theme.colors.secondary
+      : theme.colors.border;
+
+  const borderWidth = hasError
+    ? theme.borderWidths.thick
+    : isFocused
+      ? theme.borderWidths.chunky
+      : theme.borderWidths.thin;
+
+  const glowStyle =
+    isFocused && !hasError
+      ? {
+          shadowColor: theme.colors.secondary,
+          ...theme.shadows.glow,
+        }
+      : undefined;
 
   return (
     <View
@@ -45,21 +76,32 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       ) : null}
 
       <View
-        style={{
-          alignItems: 'center',
-          backgroundColor: theme.colors.inputBackground,
-          borderColor: hasError ? theme.colors.destructive : theme.colors.border,
-          borderRadius: theme.radii.xl,
-          borderWidth: hasError ? theme.borderWidths.thick : theme.borderWidths.thin,
-          flexDirection: 'row',
-          minHeight: theme.componentSizes.input.minHeight,
-          paddingHorizontal: theme.spacing.lg,
-        }}
+        style={[
+          {
+            alignItems: 'center',
+            backgroundColor: theme.colors.inputBackground,
+            borderColor,
+            borderRadius: theme.radii.xl,
+            borderWidth,
+            flexDirection: 'row',
+            minHeight: theme.componentSizes.input.minHeight,
+            paddingHorizontal: theme.spacing.lg,
+          },
+          glowStyle,
+        ]}
       >
         <TextInput
           {...props}
           accessibilityLabel={accessibilityLabel ?? label}
           allowFontScaling
+          onBlur={(e) => {
+            setIsFocused(false);
+            onBlur?.(e);
+          }}
+          onFocus={(e) => {
+            setIsFocused(true);
+            onFocus?.(e);
+          }}
           placeholderTextColor={theme.colors.inputPlaceholder}
           ref={ref}
           style={[

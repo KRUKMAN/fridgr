@@ -244,7 +244,7 @@ export default function SignInScreen(): JSX.Element {
               <Text
                 allowFontScaling
                 style={{
-                  color: theme.colors.info,
+                  color: theme.colors.primary,
                   fontSize: theme.typography.body.fontSize,
                   fontWeight: theme.typography.body.fontWeight,
                   lineHeight: theme.typography.body.lineHeight,

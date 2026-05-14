@@ -34,11 +34,9 @@ export default function TabsLayout(): React.JSX.Element | null {
           fontWeight: theme.typography.micro.fontWeight,
         },
         tabBarStyle: {
-          backgroundColor: theme.colors.surfaceElevated,
-          borderColor: theme.colors.border,
+          backgroundColor: theme.colors.surfaceContainerHigh,
           borderRadius: theme.radii.xxxl,
-          borderTopColor: theme.colors.border,
-          borderWidth: theme.borderWidths.thick,
+          borderWidth: theme.borderWidths.none,
           height: 76,
           marginBottom: theme.spacing.md,
           marginHorizontal: theme.spacing.lg,
