@@ -1,6 +1,7 @@
 import { assertEquals } from 'jsr:@std/assert@1.0.19';
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.103.1';
 
+import type { ResponseEnvelope } from '../_shared/helpers/response.ts';
 import type { HouseholdContext } from '../_shared/middleware/householdGuard.ts';
 import type { PayloadFor } from '../_shared/types/events.ts';
 import {
@@ -54,6 +55,14 @@ class FakeFridgeService implements FridgeService {
     name: 'House Soup',
   });
   public items: FridgeItemRow[] = [];
+  public idempotencyRecords = new Map<
+    string,
+    Readonly<{
+      request_hash: string;
+      response_body: ResponseEnvelope<unknown>;
+      response_code: number;
+    }>
+  >();
   public updates: Record<string, unknown>[] = [];
   public variationSnapshot: SourceSnapshot | null = makeSnapshot({
     id: variationId,
@@ -87,6 +96,23 @@ class FakeFridgeService implements FridgeService {
     return { data: row, error: null };
   }
 
+  public async createIdempotencyRecord(values: {
+    operation_id: string;
+    request_hash: string;
+    response_body: ResponseEnvelope<unknown>;
+    response_code: number;
+    route: string;
+    user_id: string;
+  }): Promise<{ error: unknown | null }> {
+    this.idempotencyRecords.set(`${values.user_id}:${values.route}:${values.operation_id}`, {
+      request_hash: values.request_hash,
+      response_body: values.response_body,
+      response_code: values.response_code,
+    });
+
+    return { error: null };
+  }
+
   public async emitFridgeEvent<
     TType extends 'FridgeItemAdded' | 'FridgeItemConsumed' | 'FridgeItemWasted',
   >(type: TType, payload: PayloadFor<TType>): Promise<string> {
@@ -105,6 +131,24 @@ class FakeFridgeService implements FridgeService {
           (item) =>
             item.household_id === household && item.id === itemId && item.archived_at === null,
         ) ?? null,
+      error: null,
+    };
+  }
+
+  public async getIdempotencyRecord(
+    user: string,
+    route: string,
+    requestedOperationId: string,
+  ): Promise<{
+    data: Readonly<{
+      request_hash: string;
+      response_body: ResponseEnvelope<unknown>;
+      response_code: number;
+    }> | null;
+    error: unknown | null;
+  }> {
+    return {
+      data: this.idempotencyRecords.get(`${user}:${route}:${requestedOperationId}`) ?? null,
       error: null,
     };
   }
@@ -319,6 +363,55 @@ Deno.test('create fridge item returns 404 when source is unavailable', async () 
   assertEquals(service.events.length, 0);
 });
 
+Deno.test(
+  'create fridge item replays the original response for the same operation id',
+  async () => {
+    const service = new FakeFridgeService();
+    const request = {
+      base_unit: 'mass_mg' as const,
+      estimated_expiry: '2026-04-30',
+      quantity_base: 1000,
+      source_id: globalFoodId,
+      source_type: 'global' as const,
+      unit_display: '1 g',
+    };
+
+    const firstResponse = await executeCreateFridgeItem(service, makeContext(), request);
+    const secondResponse = await executeCreateFridgeItem(service, makeContext(), request);
+    const firstBody = await readJson(firstResponse);
+    const secondBody = await readJson(secondResponse);
+
+    assertEquals(firstResponse.status, 201);
+    assertEquals(secondResponse.status, 201);
+    assertEquals(secondBody, firstBody);
+    assertEquals(service.createdItems.length, 1);
+    assertEquals(service.events.length, 1);
+  },
+);
+
+Deno.test('create fridge item rejects operation id reuse with a different payload', async () => {
+  const service = new FakeFridgeService();
+  const request = {
+    base_unit: 'mass_mg' as const,
+    estimated_expiry: '2026-04-30',
+    quantity_base: 1000,
+    source_id: globalFoodId,
+    source_type: 'global' as const,
+    unit_display: '1 g',
+  };
+
+  const firstResponse = await executeCreateFridgeItem(service, makeContext(), request);
+  const secondResponse = await executeCreateFridgeItem(service, makeContext(), {
+    ...request,
+    quantity_base: 1200,
+  });
+
+  assertEquals(firstResponse.status, 201);
+  assertEquals(secondResponse.status, 409);
+  assertEquals(service.createdItems.length, 1);
+  assertEquals(service.events.length, 1);
+});
+
 Deno.test('fridge mutations require an operation id before writing', async () => {
   const service = new FakeFridgeService();
   const response = await executeCreateFridgeItem(
@@ -381,7 +474,6 @@ Deno.test('consume fridge item partially decrements quantity and emits event', a
   service.items = [makeFridgeItem({ quantity_base: 1000 })];
   const response = await executeConsumeFridgeItem(service, makeContext(), fridgeItemId, {
     base_unit: 'mass_mg',
-    create_diary_entry: true,
     quantity_base: 400,
   });
 
@@ -398,6 +490,20 @@ Deno.test('consume fridge item partially decrements quantity and emits event', a
       type: 'FridgeItemConsumed',
     },
   ]);
+});
+
+Deno.test('consume fridge item rejects unsupported diary creation', async () => {
+  const service = new FakeFridgeService();
+  service.items = [makeFridgeItem({ quantity_base: 1000 })];
+  const response = await executeConsumeFridgeItem(service, makeContext(), fridgeItemId, {
+    base_unit: 'mass_mg',
+    create_diary_entry: true,
+    quantity_base: 400,
+  });
+
+  assertEquals(response.status, 422);
+  assertEquals(service.updates.length, 0);
+  assertEquals(service.events.length, 0);
 });
 
 Deno.test('consume fridge item rejects quantities above availability', async () => {

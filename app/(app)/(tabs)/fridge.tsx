@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 
 import { Ionicons } from '@expo/vector-icons';
+import { type Href, useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 
@@ -8,12 +9,13 @@ import { useFridgeItems } from '@hooks/useFridgeItems';
 import { useMe } from '@hooks/useMe';
 import type { FridgeItem } from '@lib/fridgeClient';
 
-import { EmptyState, ExpiryIndicator } from '@components';
+import { Button, EmptyState, ExpiryIndicator } from '@components';
 import { useTheme } from '@theme';
 
 import type { JSX } from 'react';
 
 export default function FridgeTab(): JSX.Element {
+  const router = useRouter();
   const theme = useTheme();
   const meQuery = useMe();
   const householdId = meQuery.data?.households[0]?.id ?? '';
@@ -55,27 +57,50 @@ export default function FridgeTab(): JSX.Element {
           ) : (
             <View style={{ paddingHorizontal: theme.spacing.lg }}>
               <EmptyState
+                actionLabel="Add item"
                 description="Add your first item to track what's in the shared fridge."
+                onActionPress={() => {
+                  router.push('/(app)/fridge/add' as Href);
+                }}
                 title="Fridge is empty"
               />
             </View>
           )
         }
         ListHeaderComponent={
-          <Text
-            allowFontScaling
+          <View
             style={{
-              color: theme.colors.text,
-              fontSize: theme.typography.title.fontSize,
-              fontWeight: theme.typography.title.fontWeight,
-              lineHeight: theme.typography.title.lineHeight,
+              alignItems: 'center',
+              flexDirection: 'row',
+              gap: theme.spacing.md,
               paddingBottom: theme.spacing.md,
               paddingHorizontal: theme.spacing.lg,
               paddingTop: theme.spacing.xl,
             }}
           >
-            Fridge
-          </Text>
+            <Text
+              allowFontScaling
+              style={{
+                color: theme.colors.text,
+                flex: 1,
+                fontSize: theme.typography.title.fontSize,
+                fontWeight: theme.typography.title.fontWeight,
+                lineHeight: theme.typography.title.lineHeight,
+              }}
+            >
+              Fridge
+            </Text>
+            <Button
+              accessibilityLabel="Add fridge item"
+              fullWidth={false}
+              iconLeft={<Ionicons color={theme.colors.primaryForeground} name="add" size={18} />}
+              label="Add"
+              onPress={() => {
+                router.push('/(app)/fridge/add' as Href);
+              }}
+              size="sm"
+            />
+          </View>
         }
         contentContainerStyle={{
           paddingBottom: 100,
@@ -97,7 +122,9 @@ export default function FridgeTab(): JSX.Element {
 }
 
 function FridgeItemRow({ item }: Readonly<{ item: FridgeItem }>): JSX.Element {
+  const router = useRouter();
   const theme = useTheme();
+  const itemPath = `/(app)/fridge/${item.id}` as const;
 
   return (
     <View
@@ -136,7 +163,7 @@ function FridgeItemRow({ item }: Readonly<{ item: FridgeItem }>): JSX.Element {
             }}
           >
             {item.unit_display}
-            {item.snapshot.category ? ` · ${item.snapshot.category}` : ''}
+            {item.snapshot.category ? ` - ${item.snapshot.category}` : ''}
           </Text>
 
           <View style={{ marginTop: theme.spacing.xxs }}>
@@ -154,19 +181,25 @@ function FridgeItemRow({ item }: Readonly<{ item: FridgeItem }>): JSX.Element {
           <QuickActionButton
             accessibilityLabel={`Consume ${item.snapshot.food_name}`}
             iconName="checkmark-circle-outline"
-            onPress={() => {}}
+            onPress={() => {
+              router.push(`${itemPath}/consume` as Href);
+            }}
             tint={theme.colors.secondary}
           />
           <QuickActionButton
             accessibilityLabel={`Waste ${item.snapshot.food_name}`}
             iconName="trash-outline"
-            onPress={() => {}}
+            onPress={() => {
+              router.push(`${itemPath}/waste` as Href);
+            }}
             tint={theme.colors.destructive}
           />
           <QuickActionButton
             accessibilityLabel={`Edit ${item.snapshot.food_name}`}
             iconName="pencil-outline"
-            onPress={() => {}}
+            onPress={() => {
+              router.push(`${itemPath}/edit` as Href);
+            }}
             tint={theme.colors.textMuted}
           />
         </View>
