@@ -100,10 +100,11 @@ class FakeFridgeService implements FridgeService {
     itemId: string,
   ): Promise<{ data: FridgeItemRow | null; error: unknown | null }> {
     return {
-      data: this.items.find(
-        (item) =>
-          item.household_id === household && item.id === itemId && item.archived_at === null,
-      ) ?? null,
+      data:
+        this.items.find(
+          (item) =>
+            item.household_id === household && item.id === itemId && item.archived_at === null,
+        ) ?? null,
       error: null,
     };
   }
@@ -239,6 +240,19 @@ Deno.test('list fridge items returns active household rows', async () => {
     body.data.items.map((item) => item.id),
     [fridgeItemId],
   );
+});
+
+Deno.test('list fridge items includes source_type derived from source FK', async () => {
+  const service = new FakeFridgeService();
+  service.items = [makeFridgeItem({ global_food_id: globalFoodId, food_variation_id: null })];
+
+  const response = await executeListFridgeItems(service, makeContext());
+  const body = (await readJson(response)) as {
+    data: { items: ReadonlyArray<{ source_type: string }> };
+  };
+
+  assertEquals(response.status, 200);
+  assertEquals(body.data.items[0]?.source_type, 'global');
 });
 
 Deno.test(
