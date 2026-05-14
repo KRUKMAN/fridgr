@@ -10,6 +10,7 @@ export { Card, type CardProps } from './Card';
 export { Chip, type ChipProps, type ChipVariant } from './Chip';
 export { Divider, type DividerProps } from './Divider';
 export { EmptyState, type EmptyStateProps } from './EmptyState';
+export { ExpiryIndicator, type ExpiryIndicatorProps } from './ExpiryIndicator';
 export { Header, type HeaderProps } from './Header';
 export {
   IconButton,
