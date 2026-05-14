@@ -16,7 +16,7 @@
     "prepare": "husky",
     "verify:function-auth": "node scripts/verifyEdgeAuthImports.cjs",
     "smoke:wave3": "node scripts/wave3Smoke.cjs",
-    "test": "node --test test/ciSmoke.test.js && deno test --config supabase/functions/deno.json supabase/functions/_shared supabase/functions/households supabase/functions/diary"
+    "test": "node --test test/ciSmoke.test.js && tsc --module commonjs --moduleResolution node --target ES2022 --esModuleInterop --skipLibCheck --strict --outDir node_modules/.cache/expiry-tests src/lib/expiryIndicator.ts src/lib/expiryIndicator.test.ts && node node_modules/.cache/expiry-tests/expiryIndicator.test.js && deno test --config supabase/functions/deno.json supabase/functions/_shared supabase/functions/households supabase/functions/diary supabase/functions/food-catalog supabase/functions/fridge-items"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

@@ -69,15 +69,13 @@ type SourceSnapshot = Readonly<{
   protein_mg_per_100_unit: number;
 }>;
 
-type GlobalFoodSnapshotRow =
-  & Omit<SourceSnapshot, 'name'>
-  & Readonly<{
+type GlobalFoodSnapshotRow = Omit<SourceSnapshot, 'name'> &
+  Readonly<{
     canonical_name: string;
   }>;
 
-type HouseholdFoodSnapshotRow =
-  & Omit<SourceSnapshot, 'category'>
-  & Readonly<{
+type HouseholdFoodSnapshotRow = Omit<SourceSnapshot, 'category'> &
+  Readonly<{
     category?: string | null;
   }>;
 
@@ -301,7 +299,9 @@ export const createFridgeService = (supabase: SupabaseClient): FridgeService => 
       .select(FRIDGE_ITEM_SELECT)
       .eq('household_id', householdId)
       .is('archived_at', null)
-      .order('created_at', { ascending: false });
+      .order('estimated_expiry', { ascending: true, nullsFirst: false })
+      .order('snapshot_category', { ascending: true, nullsFirst: false })
+      .order('snapshot_food_name', { ascending: true });
 
     return result as { data: FridgeItemRow[] | null; error: unknown | null };
   },
@@ -332,6 +332,9 @@ const sourceColumnsForType = (
   personal_food_id: null,
 });
 
+const getSourceType = (row: FridgeItemRow): FridgeSourceType =>
+  row.global_food_id ? 'global' : row.food_variation_id ? 'variation' : 'household';
+
 const mapFridgeItem = (row: FridgeItemRow) => ({
   added_by: row.added_by,
   archived_at: row.archived_at,
@@ -354,6 +357,7 @@ const mapFridgeItem = (row: FridgeItemRow) => ({
     nutrition_basis: row.snapshot_nutrition_basis,
     protein_mg_per_100_unit: row.snapshot_protein_mg_per_100_unit,
   },
+  source_type: getSourceType(row),
   unit_display: row.unit_display,
   updated_at: row.updated_at,
   version: row.version,
@@ -363,13 +367,13 @@ const getFridgeEventContext = (
   context: HouseholdContext,
 ): Readonly<
   | {
-    context: FridgeEventContext;
-    ok: true;
-  }
+      context: FridgeEventContext;
+      ok: true;
+    }
   | {
-    ok: false;
-    response: Response;
-  }
+      ok: false;
+      response: Response;
+    }
 > => {
   if (!context.operation_id) {
     return {
@@ -399,19 +403,20 @@ const getSourceSnapshot = async (
   request: CreateFridgeItemRequest,
 ): Promise<
   | Readonly<{
-    ok: false;
-    response: Response;
-  }>
+      ok: false;
+      response: Response;
+    }>
   | Readonly<{
-    ok: true;
-    snapshot: SourceSnapshot;
-  }>
+      ok: true;
+      snapshot: SourceSnapshot;
+    }>
 > => {
-  const result = request.source_type === 'global'
-    ? await service.getGlobalFoodSnapshot(request.source_id)
-    : request.source_type === 'household'
-    ? await service.getHouseholdFoodSnapshot(context.household_id, request.source_id)
-    : await service.getVariationSnapshot(context.household_id, request.source_id);
+  const result =
+    request.source_type === 'global'
+      ? await service.getGlobalFoodSnapshot(request.source_id)
+      : request.source_type === 'household'
+        ? await service.getHouseholdFoodSnapshot(context.household_id, request.source_id)
+        : await service.getVariationSnapshot(context.household_id, request.source_id);
 
   if (result.error) {
     return {
@@ -451,13 +456,13 @@ const loadMutableFridgeItem = async (
   itemId: string | null,
 ): Promise<
   | Readonly<{
-    item: FridgeItemRow;
-    ok: true;
-  }>
+      item: FridgeItemRow;
+      ok: true;
+    }>
   | Readonly<{
-    ok: false;
-    response: Response;
-  }>
+      ok: false;
+      response: Response;
+    }>
 > => {
   if (!itemId) {
     return {
@@ -495,13 +500,15 @@ const loadMutableFridgeItem = async (
 };
 
 const ensureCanMutateItem = (item: FridgeItemRow, context: HouseholdContext): Response | null =>
-  item.added_by === context.user_id ? null : err(
-    'forbidden',
-    'only the member who added this fridge item can change it',
-    403,
-    undefined,
-    context.operation_id,
-  );
+  item.added_by === context.user_id
+    ? null
+    : err(
+        'forbidden',
+        'only the member who added this fridge item can change it',
+        403,
+        undefined,
+        context.operation_id,
+      );
 
 const updateQuantityOrArchive = async (
   service: FridgeService,
@@ -514,12 +521,12 @@ const updateQuantityOrArchive = async (
     item.id,
     remainingQuantity === 0
       ? {
-        archived_at: new Date().toISOString(),
-      }
+          archived_at: new Date().toISOString(),
+        }
       : {
-        quantity_base: remainingQuantity,
-        version: item.version + 1,
-      },
+          quantity_base: remainingQuantity,
+          version: item.version + 1,
+        },
   );
 
 export const executeListFridgeItems = async (
@@ -833,21 +840,22 @@ const bodyScopedHandler = withHousehold({
   householdIdFrom: 'body',
 });
 
-const createFridgeRouteHandler = (
-  handler: (
-    request: Request,
-    context: HouseholdContext,
-    service: FridgeService,
-  ) => Promise<Response>,
-) =>
-(request: Request): Promise<Response> =>
-  withAuth(
-    request,
-    pathScopedHandler(
-      async (householdRequest, context): Promise<Response> =>
-        await handler(householdRequest, context, createFridgeService(context.supabase)),
-    ),
-  );
+const createFridgeRouteHandler =
+  (
+    handler: (
+      request: Request,
+      context: HouseholdContext,
+      service: FridgeService,
+    ) => Promise<Response>,
+  ) =>
+  (request: Request): Promise<Response> =>
+    withAuth(
+      request,
+      pathScopedHandler(
+        async (householdRequest, context): Promise<Response> =>
+          await handler(householdRequest, context, createFridgeService(context.supabase)),
+      ),
+    );
 
 const handleGetFridgeRoute = createFridgeRouteHandler(
   async (_request, context, service) => await executeListFridgeItems(service, context),
