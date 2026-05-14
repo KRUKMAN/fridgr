@@ -1,8 +1,12 @@
+/* eslint-disable react-native/no-inline-styles */
+
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, Tabs, type Href } from 'expo-router';
+import { View } from 'react-native';
 
 import { useMe } from '@hooks/useMe';
 
+import { EmptyState } from '@components';
 import { useTheme } from '@theme';
 
 import type React from 'react';
@@ -17,6 +21,28 @@ export default function TabsLayout(): React.JSX.Element | null {
 
   if (meQuery.error?.status === 401) {
     return <Redirect href="/(auth)/sign-in" />;
+  }
+
+  if (meQuery.isError) {
+    return (
+      <View
+        style={{
+          backgroundColor: theme.colors.background,
+          flex: 1,
+          justifyContent: 'center',
+          padding: theme.spacing.lg,
+        }}
+      >
+        <EmptyState
+          actionLabel="Retry"
+          description={meQuery.error?.message ?? 'Could not load your household.'}
+          onActionPress={() => {
+            void meQuery.refetch();
+          }}
+          title="Could not load account"
+        />
+      </View>
+    );
   }
 
   if ((meQuery.data?.households.length ?? 0) === 0) {

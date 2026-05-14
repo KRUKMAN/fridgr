@@ -1,7 +1,7 @@
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.103.1';
 
 import { emitEvent } from '../_shared/helpers/eventEmitter.ts';
-import { err, handleOptions, ok } from '../_shared/helpers/response.ts';
+import { err, handleOptions, ok, type ResponseEnvelope } from '../_shared/helpers/response.ts';
 import { validate } from '../_shared/helpers/validate.ts';
 import { extractOperationId, withAuth } from '../_shared/middleware/auth.ts';
 import { type HouseholdContext, withHousehold } from '../_shared/middleware/householdGuard.ts';
@@ -81,6 +81,12 @@ type HouseholdFoodSnapshotRow = Omit<SourceSnapshot, 'category'> &
 
 type FridgeEventContext = HouseholdContext & Readonly<{ operation_id: string }>;
 
+type IdempotencyRecord = Readonly<{
+  request_hash: string;
+  response_body: ResponseEnvelope<unknown>;
+  response_code: number;
+}>;
+
 export type FridgeItemRow = Readonly<{
   added_by: string;
   archived_at: string | null;
@@ -108,6 +114,14 @@ export type FridgeItemRow = Readonly<{
 }>;
 
 export type FridgeService = Readonly<{
+  createIdempotencyRecord: (values: {
+    operation_id: string;
+    request_hash: string;
+    response_body: ResponseEnvelope<unknown>;
+    response_code: number;
+    route: string;
+    user_id: string;
+  }) => Promise<{ error: unknown | null }>;
   createFridgeItem: (
     values: Record<string, unknown>,
   ) => Promise<{ data: FridgeItemRow | null; error: unknown | null }>;
@@ -120,6 +134,11 @@ export type FridgeService = Readonly<{
     householdId: string,
     itemId: string,
   ) => Promise<{ data: FridgeItemRow | null; error: unknown | null }>;
+  getIdempotencyRecord: (
+    userId: string,
+    route: string,
+    operationId: string,
+  ) => Promise<{ data: IdempotencyRecord | null; error: unknown | null }>;
   getGlobalFoodSnapshot: (
     sourceId: string,
   ) => Promise<{ data: SourceSnapshot | null; error: unknown | null }>;
@@ -233,6 +252,11 @@ const toHouseholdSnapshot = (row: HouseholdFoodSnapshotRow): SourceSnapshot => (
 });
 
 export const createFridgeService = (supabase: SupabaseClient): FridgeService => ({
+  createIdempotencyRecord: async (values) => {
+    const result = await supabase.from('idempotency_keys').insert(values);
+
+    return { error: result.error };
+  },
   createFridgeItem: async (values) => {
     const result = await supabase
       .from('fridge_items')
@@ -243,6 +267,17 @@ export const createFridgeService = (supabase: SupabaseClient): FridgeService => 
     return result;
   },
   emitFridgeEvent: async (type, payload, context) => await emitEvent(type, payload, context),
+  getIdempotencyRecord: async (userId, route, operationId) => {
+    const result = await supabase
+      .from('idempotency_keys')
+      .select('request_hash,response_body,response_code')
+      .eq('user_id', userId)
+      .eq('route', route)
+      .eq('operation_id', operationId)
+      .maybeSingle<IdempotencyRecord>();
+
+    return result;
+  },
   getFridgeItem: async (householdId, itemId) => {
     const result = await supabase
       .from('fridge_items')
@@ -395,6 +430,107 @@ const getFridgeEventContext = (
     },
     ok: true,
   };
+};
+
+const normalizeForHash = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(normalizeForHash);
+  }
+
+  if (typeof value === 'object' && value !== null) {
+    return Object.fromEntries(
+      Object.entries(value)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, nestedValue]) => [key, normalizeForHash(nestedValue)]),
+    );
+  }
+
+  return value;
+};
+
+const createRequestHash = async (route: string, request: unknown): Promise<string> => {
+  const payload = JSON.stringify({
+    request: normalizeForHash(request),
+    route,
+  });
+  const bytes = new TextEncoder().encode(payload);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+};
+
+const responseFromEnvelope = (envelope: ResponseEnvelope<unknown>, status: number): Response => {
+  if (envelope.error) {
+    return err(
+      envelope.error.code,
+      envelope.error.message,
+      status,
+      envelope.error.details,
+      envelope.operation_id ?? undefined,
+    );
+  }
+
+  return ok(envelope.data, envelope.operation_id ?? undefined, status);
+};
+
+const executeIdempotentMutation = async (
+  service: FridgeService,
+  context: FridgeEventContext,
+  route: string,
+  requestPayload: unknown,
+  mutate: () => Promise<Response>,
+): Promise<Response> => {
+  const requestHash = await createRequestHash(route, requestPayload);
+  const existing = await service.getIdempotencyRecord(context.user_id, route, context.operation_id);
+
+  if (existing.error) {
+    return err(
+      'internal_error',
+      'failed to check idempotency key',
+      500,
+      undefined,
+      context.operation_id,
+    );
+  }
+
+  if (existing.data) {
+    if (existing.data.request_hash !== requestHash) {
+      return err(
+        'conflict',
+        'operation_id was already used with a different payload',
+        409,
+        undefined,
+        context.operation_id,
+      );
+    }
+
+    return responseFromEnvelope(existing.data.response_body, existing.data.response_code);
+  }
+
+  const response = await mutate();
+  const responseBody = (await response.clone().json()) as ResponseEnvelope<unknown>;
+  const stored = await service.createIdempotencyRecord({
+    operation_id: context.operation_id,
+    request_hash: requestHash,
+    response_body: responseBody,
+    response_code: response.status,
+    route,
+    user_id: context.user_id,
+  });
+
+  if (stored.error) {
+    return err(
+      'internal_error',
+      'failed to record idempotency key',
+      500,
+      undefined,
+      context.operation_id,
+    );
+  }
+
+  return response;
 };
 
 const getSourceSnapshot = async (
@@ -564,59 +700,67 @@ export const executeCreateFridgeItem = async (
     return eventContext.response;
   }
 
-  const snapshotResult = await getSourceSnapshot(service, context, request);
-
-  if (!snapshotResult.ok) {
-    return snapshotResult.response;
-  }
-
-  const { snapshot } = snapshotResult;
-  const { data, error } = await service.createFridgeItem({
-    ...sourceColumnsForType(request.source_type, request.source_id),
-    added_by: context.user_id,
-    base_unit: request.base_unit,
-    estimated_expiry: request.estimated_expiry ?? null,
-    household_id: context.household_id,
-    quantity_base: request.quantity_base,
-    snapshot_carbs_mg_per_100_unit: snapshot.carbs_mg_per_100_unit,
-    snapshot_category: snapshot.category,
-    snapshot_density_mg_per_ml: snapshot.density_mg_per_ml,
-    snapshot_fat_mg_per_100_unit: snapshot.fat_mg_per_100_unit,
-    snapshot_food_name: snapshot.name,
-    snapshot_kcal_per_100_unit: snapshot.kcal_per_100_unit,
-    snapshot_nutrition_basis: snapshot.nutrition_basis,
-    snapshot_protein_mg_per_100_unit: snapshot.protein_mg_per_100_unit,
-    unit_display: request.unit_display,
-  });
-
-  if (error || !data) {
-    return err(
-      'internal_error',
-      'failed to create fridge item',
-      500,
-      undefined,
-      context.operation_id,
-    );
-  }
-
-  await service.emitFridgeEvent(
-    'FridgeItemAdded',
-    {
-      base_unit: data.base_unit,
-      fridge_item_id: data.id,
-      quantity_base: data.quantity_base,
-      snapshot_food_name: data.snapshot_food_name,
-      source_type: 'manual_add',
-    },
+  return await executeIdempotentMutation(
+    service,
     eventContext.context,
-  );
+    'POST /households/:id/fridge/items',
+    request,
+    async () => {
+      const snapshotResult = await getSourceSnapshot(service, context, request);
 
-  return ok(
-    {
-      item: mapFridgeItem(data),
+      if (!snapshotResult.ok) {
+        return snapshotResult.response;
+      }
+
+      const { snapshot } = snapshotResult;
+      const { data, error } = await service.createFridgeItem({
+        ...sourceColumnsForType(request.source_type, request.source_id),
+        added_by: context.user_id,
+        base_unit: request.base_unit,
+        estimated_expiry: request.estimated_expiry ?? null,
+        household_id: context.household_id,
+        quantity_base: request.quantity_base,
+        snapshot_carbs_mg_per_100_unit: snapshot.carbs_mg_per_100_unit,
+        snapshot_category: snapshot.category,
+        snapshot_density_mg_per_ml: snapshot.density_mg_per_ml,
+        snapshot_fat_mg_per_100_unit: snapshot.fat_mg_per_100_unit,
+        snapshot_food_name: snapshot.name,
+        snapshot_kcal_per_100_unit: snapshot.kcal_per_100_unit,
+        snapshot_nutrition_basis: snapshot.nutrition_basis,
+        snapshot_protein_mg_per_100_unit: snapshot.protein_mg_per_100_unit,
+        unit_display: request.unit_display,
+      });
+
+      if (error || !data) {
+        return err(
+          'internal_error',
+          'failed to create fridge item',
+          500,
+          undefined,
+          context.operation_id,
+        );
+      }
+
+      await service.emitFridgeEvent(
+        'FridgeItemAdded',
+        {
+          base_unit: data.base_unit,
+          fridge_item_id: data.id,
+          quantity_base: data.quantity_base,
+          snapshot_food_name: data.snapshot_food_name,
+          source_type: 'manual_add',
+        },
+        eventContext.context,
+      );
+
+      return ok(
+        {
+          item: mapFridgeItem(data),
+        },
+        context.operation_id,
+        201,
+      );
     },
-    context.operation_id,
-    201,
   );
 };
 
@@ -632,42 +776,54 @@ export const executeUpdateFridgeItem = async (
     return eventContext.response;
   }
 
-  const itemResult = await loadMutableFridgeItem(service, context, itemId);
+  return await executeIdempotentMutation(
+    service,
+    eventContext.context,
+    'PATCH /households/:id/fridge/items/:item',
+    { item_id: itemId, ...request },
+    async () => {
+      const itemResult = await loadMutableFridgeItem(service, context, itemId);
 
-  if (!itemResult.ok) {
-    return itemResult.response;
-  }
+      if (!itemResult.ok) {
+        return itemResult.response;
+      }
 
-  const permissionError = ensureCanMutateItem(itemResult.item, context);
+      const permissionError = ensureCanMutateItem(itemResult.item, context);
 
-  if (permissionError) {
-    return permissionError;
-  }
+      if (permissionError) {
+        return permissionError;
+      }
 
-  const { data, error } = await service.updateFridgeItem(context.household_id, itemResult.item.id, {
-    ...(request.estimated_expiry === undefined
-      ? {}
-      : { estimated_expiry: request.estimated_expiry }),
-    ...(request.quantity_base === undefined ? {} : { quantity_base: request.quantity_base }),
-    ...(request.unit_display === undefined ? {} : { unit_display: request.unit_display }),
-    version: itemResult.item.version + 1,
-  });
+      const { data, error } = await service.updateFridgeItem(
+        context.household_id,
+        itemResult.item.id,
+        {
+          ...(request.estimated_expiry === undefined
+            ? {}
+            : { estimated_expiry: request.estimated_expiry }),
+          ...(request.quantity_base === undefined ? {} : { quantity_base: request.quantity_base }),
+          ...(request.unit_display === undefined ? {} : { unit_display: request.unit_display }),
+          version: itemResult.item.version + 1,
+        },
+      );
 
-  if (error || !data) {
-    return err(
-      'internal_error',
-      'failed to update fridge item',
-      500,
-      undefined,
-      context.operation_id,
-    );
-  }
+      if (error || !data) {
+        return err(
+          'internal_error',
+          'failed to update fridge item',
+          500,
+          undefined,
+          context.operation_id,
+        );
+      }
 
-  return ok(
-    {
-      item: mapFridgeItem(data),
+      return ok(
+        {
+          item: mapFridgeItem(data),
+        },
+        context.operation_id,
+      );
     },
-    context.operation_id,
   );
 };
 
@@ -683,71 +839,94 @@ export const executeConsumeFridgeItem = async (
     return eventContext.response;
   }
 
-  const itemResult = await loadMutableFridgeItem(service, context, itemId);
-
-  if (!itemResult.ok) {
-    return itemResult.response;
-  }
-
-  const { item } = itemResult;
-  const permissionError = ensureCanMutateItem(item, context);
-
-  if (permissionError) {
-    return permissionError;
-  }
-
-  if (item.base_unit !== request.base_unit) {
-    return err(
-      'conflict',
-      'base_unit does not match fridge item',
-      409,
-      undefined,
-      context.operation_id,
-    );
-  }
-
-  if (request.quantity_base > item.quantity_base) {
-    return err(
-      'conflict',
-      'cannot consume more than the available quantity',
-      409,
-      {
-        available_quantity: item.quantity_base,
-      },
-      context.operation_id,
-    );
-  }
-
-  const remainingQuantity = item.quantity_base - request.quantity_base;
-  const { data, error } = await updateQuantityOrArchive(service, context, item, remainingQuantity);
-
-  if (error || !data) {
-    return err(
-      'internal_error',
-      'failed to consume fridge item',
-      500,
-      undefined,
-      context.operation_id,
-    );
-  }
-
-  await service.emitFridgeEvent(
-    'FridgeItemConsumed',
-    {
-      base_unit: item.base_unit,
-      fridge_item_id: item.id,
-      quantity_consumed: request.quantity_base,
-      remaining_quantity: remainingQuantity,
-    },
+  return await executeIdempotentMutation(
+    service,
     eventContext.context,
-  );
+    'POST /households/:id/fridge/items/:item/consume',
+    { item_id: itemId, ...request },
+    async () => {
+      if (request.create_diary_entry === true) {
+        return err(
+          'validation_error',
+          'create_diary_entry is not supported for fridge consume yet',
+          422,
+          undefined,
+          context.operation_id,
+        );
+      }
 
-  return ok(
-    {
-      item: mapFridgeItem(data),
-      remaining_quantity: remainingQuantity,
+      const itemResult = await loadMutableFridgeItem(service, context, itemId);
+
+      if (!itemResult.ok) {
+        return itemResult.response;
+      }
+
+      const { item } = itemResult;
+      const permissionError = ensureCanMutateItem(item, context);
+
+      if (permissionError) {
+        return permissionError;
+      }
+
+      if (item.base_unit !== request.base_unit) {
+        return err(
+          'conflict',
+          'base_unit does not match fridge item',
+          409,
+          undefined,
+          context.operation_id,
+        );
+      }
+
+      if (request.quantity_base > item.quantity_base) {
+        return err(
+          'conflict',
+          'cannot consume more than the available quantity',
+          409,
+          {
+            available_quantity: item.quantity_base,
+          },
+          context.operation_id,
+        );
+      }
+
+      const remainingQuantity = item.quantity_base - request.quantity_base;
+      const { data, error } = await updateQuantityOrArchive(
+        service,
+        context,
+        item,
+        remainingQuantity,
+      );
+
+      if (error || !data) {
+        return err(
+          'internal_error',
+          'failed to consume fridge item',
+          500,
+          undefined,
+          context.operation_id,
+        );
+      }
+
+      await service.emitFridgeEvent(
+        'FridgeItemConsumed',
+        {
+          base_unit: item.base_unit,
+          fridge_item_id: item.id,
+          quantity_consumed: request.quantity_base,
+          remaining_quantity: remainingQuantity,
+        },
+        eventContext.context,
+      );
+
+      return ok(
+        {
+          item: mapFridgeItem(data),
+          remaining_quantity: remainingQuantity,
+        },
+        context.operation_id,
+      );
     },
-    context.operation_id,
   );
 };
 
@@ -763,72 +942,85 @@ export const executeWasteFridgeItem = async (
     return eventContext.response;
   }
 
-  const itemResult = await loadMutableFridgeItem(service, context, itemId);
-
-  if (!itemResult.ok) {
-    return itemResult.response;
-  }
-
-  const { item } = itemResult;
-  const permissionError = ensureCanMutateItem(item, context);
-
-  if (permissionError) {
-    return permissionError;
-  }
-
-  if (item.base_unit !== request.base_unit) {
-    return err(
-      'conflict',
-      'base_unit does not match fridge item',
-      409,
-      undefined,
-      context.operation_id,
-    );
-  }
-
-  if (request.quantity_base > item.quantity_base) {
-    return err(
-      'conflict',
-      'cannot waste more than the available quantity',
-      409,
-      {
-        available_quantity: item.quantity_base,
-      },
-      context.operation_id,
-    );
-  }
-
-  const remainingQuantity = item.quantity_base - request.quantity_base;
-  const { data, error } = await updateQuantityOrArchive(service, context, item, remainingQuantity);
-
-  if (error || !data) {
-    return err(
-      'internal_error',
-      'failed to waste fridge item',
-      500,
-      undefined,
-      context.operation_id,
-    );
-  }
-
-  await service.emitFridgeEvent(
-    'FridgeItemWasted',
-    {
-      base_unit: item.base_unit,
-      fridge_item_id: item.id,
-      quantity_wasted: request.quantity_base,
-      ...(request.reason ? { reason: request.reason } : {}),
-      remaining_quantity: remainingQuantity,
-    },
+  return await executeIdempotentMutation(
+    service,
     eventContext.context,
-  );
+    'POST /households/:id/fridge/items/:item/waste',
+    { item_id: itemId, ...request },
+    async () => {
+      const itemResult = await loadMutableFridgeItem(service, context, itemId);
 
-  return ok(
-    {
-      item: mapFridgeItem(data),
-      remaining_quantity: remainingQuantity,
+      if (!itemResult.ok) {
+        return itemResult.response;
+      }
+
+      const { item } = itemResult;
+      const permissionError = ensureCanMutateItem(item, context);
+
+      if (permissionError) {
+        return permissionError;
+      }
+
+      if (item.base_unit !== request.base_unit) {
+        return err(
+          'conflict',
+          'base_unit does not match fridge item',
+          409,
+          undefined,
+          context.operation_id,
+        );
+      }
+
+      if (request.quantity_base > item.quantity_base) {
+        return err(
+          'conflict',
+          'cannot waste more than the available quantity',
+          409,
+          {
+            available_quantity: item.quantity_base,
+          },
+          context.operation_id,
+        );
+      }
+
+      const remainingQuantity = item.quantity_base - request.quantity_base;
+      const { data, error } = await updateQuantityOrArchive(
+        service,
+        context,
+        item,
+        remainingQuantity,
+      );
+
+      if (error || !data) {
+        return err(
+          'internal_error',
+          'failed to waste fridge item',
+          500,
+          undefined,
+          context.operation_id,
+        );
+      }
+
+      await service.emitFridgeEvent(
+        'FridgeItemWasted',
+        {
+          base_unit: item.base_unit,
+          fridge_item_id: item.id,
+          quantity_wasted: request.quantity_base,
+          ...(request.reason ? { reason: request.reason } : {}),
+          remaining_quantity: remainingQuantity,
+        },
+        eventContext.context,
+      );
+
+      return ok(
+        {
+          item: mapFridgeItem(data),
+          remaining_quantity: remainingQuantity,
+        },
+        context.operation_id,
+      );
     },
-    context.operation_id,
   );
 };
 
